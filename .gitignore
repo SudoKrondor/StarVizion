@@ -1,0 +1,19 @@
+# Cargo build output
+/target/
+
+# IDEs
+/.idea/
+/.vscode/
+*.iml
+
+# Drafts and reports written by the .claude/commands workflows
+/change-summary.txt
+/code-integrity-review.md
+/version-diff.txt
+
+# Claude Code local settings
+/.claude/settings.local.json
+
+# OS clutter
+.DS_Store
+Thumbs.db
