@@ -40,7 +40,7 @@
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="RsBuildProfile:dev" />
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/StarVizion" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -59,23 +59,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.702380397651975" />
-      <entry key="MS500" value="4.109839583513217" />
-      <entry key="S2" value="6.982817581366145" />
-      <entry key="S5" value="8.088706568302864" />
-      <entry key="S10" value="8.624829152156178" />
-      <entry key="S30" value="11.261422658343388" />
-      <entry key="S60" value="15.7983896922897" />
-      <entry key="M2" value="21.076733403209637" />
-      <entry key="M5" value="26.251182129152472" />
-      <entry key="M10" value="28.470578236787578" />
-      <entry key="M15" value="29.27710658199422" />
-      <entry key="M30" value="30.11967215112892" />
-      <entry key="H1" value="30.555004626434357" />
-      <entry key="H2" value="30.776280254117356" />
-      <entry key="H4" value="30.887832818486395" />
-      <entry key="D1" value="30.9812626348491" />
-      <entry key="W1" value="30.997322182528745" />
+      <entry key="MS100" value="1.0020933075440162" />
+      <entry key="MS500" value="1.2911861829821754" />
+      <entry key="S2" value="1.7822800722356082" />
+      <entry key="S5" value="2.503281943574283" />
+      <entry key="S10" value="5.000691401492194" />
+      <entry key="S30" value="22.134086983193356" />
+      <entry key="S60" value="45.30576869574696" />
+      <entry key="M2" value="72.18886590202112" />
+      <entry key="M5" value="100.55119873621565" />
+      <entry key="M10" value="113.53396378103457" />
+      <entry key="M15" value="118.38595977234951" />
+      <entry key="M30" value="123.53369739588679" />
+      <entry key="H1" value="126.22552389359575" />
+      <entry key="H2" value="127.60223556777979" />
+      <entry key="H4" value="128.29846132886843" />
+      <entry key="D1" value="128.88270580408673" />
+      <entry key="W1" value="128.98323457057586" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -97,23 +97,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="1.670944755065144" />
-      <entry key="MS500" value="4.093372573703026" />
-      <entry key="S2" value="6.975182972218495" />
-      <entry key="S5" value="8.085051215595854" />
-      <entry key="S10" value="8.622795657429512" />
-      <entry key="S30" value="11.260193406547636" />
-      <entry key="S60" value="15.797125408354358" />
-      <entry key="M2" value="21.075638766218386" />
-      <entry key="M5" value="26.25054030360951" />
-      <entry key="M10" value="28.470210983266266" />
-      <entry key="M15" value="29.276850297378974" />
-      <entry key="M30" value="30.11953796912764" />
-      <entry key="H1" value="30.554935963624676" />
-      <entry key="H2" value="30.77624552177171" />
-      <entry key="H4" value="30.887815351063573" />
-      <entry key="D1" value="30.98125970946255" />
-      <entry key="W1" value="30.99732176426874" />
+      <entry key="MS100" value="0.9679583307292232" />
+      <entry key="MS500" value="1.2822673085294232" />
+      <entry key="S2" value="1.7791921598714628" />
+      <entry key="S5" value="2.5015027308780757" />
+      <entry key="S10" value="4.998581187753852" />
+      <entry key="S30" value="22.130337245129997" />
+      <entry key="S60" value="45.301817690615195" />
+      <entry key="M2" value="72.18557461277398" />
+      <entry key="M5" value="100.54925813429043" />
+      <entry key="M10" value="113.53283887766705" />
+      <entry key="M15" value="118.38517011257828" />
+      <entry key="M30" value="123.53328114594493" />
+      <entry key="H1" value="126.22531009830595" />
+      <entry key="H2" value="127.60212721096816" />
+      <entry key="H4" value="128.29840678033005" />
+      <entry key="D1" value="128.88269666079623" />
+      <entry key="W1" value="128.98323326311527" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{

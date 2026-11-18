@@ -22,6 +22,8 @@ cargo clippy --workspace --all-targets -- -D warnings  # lint, as CI runs it
 
 ## Rules
 
+Follow `docs/CODING_STANDARD.md`. The rules below take precedence where they overlap.
+
 - **Read-only towards games.** Never send, intercept or remap input, never write a game file, never read
   game memory or inject into a process. Game data comes only from providers.
 - **Standalone first.** Nothing a pilot needs for controller visualization may depend on a plugin or on
