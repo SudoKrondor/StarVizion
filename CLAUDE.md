@@ -1,0 +1,32 @@
+# CLAUDE.md
+
+Guidance for Claude Code working in this repository.
+
+## What this is
+
+StarVizion: live controller-input and game-data overlays, on the desktop and in VR. A Rust cargo workspace,
+Windows and Linux. Read `README.md` for the layout and `docs/DECISIONS.md` for why it is shaped this way.
+
+The product design (Vizlets, NeuroNodes, StarCalc, HoloFrames, render modes) lives in the Elite Intel repository
+under `docs/02-features/starvizion/`. Where it assumes Elite Intel as the host, `docs/DECISIONS.md` wins.
+
+## Commands
+
+```bash
+cargo build                                          # debug build
+cargo run                                            # run the app
+cargo test --workspace                               # all tests
+cargo fmt --all                                      # format
+cargo clippy --workspace --all-targets -- -D warnings  # lint, as CI runs it
+```
+
+## Rules
+
+- **Read-only towards games.** Never send, intercept or remap input, never write a game file, never read
+  game memory or inject into a process. Game data comes only from providers.
+- **Standalone first.** Nothing a pilot needs for controller visualization may depend on a plugin or on
+  Elite Intel being installed.
+- **`starvizion-provider-api` is public.** Third-party developers build against it: change it only
+  compatibly, and version it.
+- **No sandboxed packaging.** Installers are a setup `.exe`, `.deb` and `.rpm`. Never Flatpak or Snap.
+- Record a new architectural decision in `docs/DECISIONS.md`, with who decided it and when.

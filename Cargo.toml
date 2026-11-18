@@ -1,0 +1,25 @@
+[workspace]
+resolver = "3"
+members = ["crates/*", "plugins/*"]
+default-members = ["crates/starvizion"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+repository = "https://github.com/SudoKrondor/StarVizion"
+license = "MIT"
+publish = false
+
+[workspace.dependencies]
+starvizion-model = { path = "crates/model" }
+starvizion-starcalc = { path = "crates/starcalc" }
+starvizion-input = { path = "crates/input" }
+starvizion-render = { path = "crates/render" }
+starvizion-vr = { path = "crates/vr" }
+starvizion-provider-api = { path = "crates/provider-api" }
+starvizion-plugin-elite-intel = { path = "plugins/elite-intel" }
+
+[profile.release]
+lto = "thin"
+codegen-units = 1

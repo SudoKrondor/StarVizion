@@ -1,0 +1,9 @@
+[package]
+name = "starvizion-render"
+description = "Composes a Vizlet frame and presents it on the desktop"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+license.workspace = true
+publish.workspace = true

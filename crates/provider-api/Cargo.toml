@@ -1,0 +1,9 @@
+[package]
+name = "starvizion-provider-api"
+description = "The public API for StarVizion providers and plugins"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+license.workspace = true
+publish.workspace = true

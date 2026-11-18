@@ -1,0 +1,12 @@
+[package]
+name = "starvizion-plugin-elite-intel"
+description = "Bundled plugin: Elite Intel's data and cards, when Elite Intel is running"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+starvizion-provider-api.workspace = true

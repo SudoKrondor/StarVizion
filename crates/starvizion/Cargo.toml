@@ -1,0 +1,18 @@
+[package]
+name = "starvizion"
+description = "Live controller-input and game-data overlays, on the desktop and in VR"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+starvizion-model.workspace = true
+starvizion-starcalc.workspace = true
+starvizion-input.workspace = true
+starvizion-render.workspace = true
+starvizion-vr.workspace = true
+starvizion-provider-api.workspace = true
+starvizion-plugin-elite-intel.workspace = true

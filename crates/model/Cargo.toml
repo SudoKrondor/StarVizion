@@ -1,0 +1,9 @@
+[package]
+name = "starvizion-model"
+description = "Vizlets, NeuroNodes and HoloFrames, and their files"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+license.workspace = true
+publish.workspace = true
