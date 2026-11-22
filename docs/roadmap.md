@@ -2,9 +2,9 @@
 
 ## Post-First-Release Roadmap
 
-**Journal Telemetry Bindings** — StarCalc expressions referencing live game data from Elite Dangerous journal events (ship hull health, cargo fill level, current system, game mode). Requires a journal-parsing subsystem that normalises journal events into a field registry StarCalc can query — see [Telemetry](../../03-data-models/telemetry.md).
+**Third-Party Vizlets and Providers** — other developers write plugins and providers against the public `starvizion-provider-api`, supplying game data, game modes and Vizlet content for games StarVizion itself knows nothing about. The API is versioned and changes only compatibly.
 
-**CAPI Telemetry Bindings** — integration with Frontier's Commander API for data not available in the journal (market prices, fleet carrier status, ship loadout). Would require OAuth2 authentication against Frontier's Auth service, built from scratch — the StellarCore plan was to share it with a plugin that is not being built ([FlightDeck](../../04-other-ideas/FlightDeck.md)), so there is no existing infrastructure to borrow. Note this is distinct from [Telemetry](../../03-data-models/telemetry.md), which needs no CAPI at all: journal and `Status.json` cover those fields locally. Only genuinely CAPI-only data (market prices, carrier status, stored loadouts) would justify the cost.
+**Richer Elite Dangerous Data** — anything beyond what the bundled Elite Intel plugin offers (for example Frontier's Commander API data: market prices, fleet carrier status, stored loadouts) belongs in a provider, not in StarVizion. StarVizion never reads game files itself.
 
 **Theme and Skin System** — a global colour theme system for Vizlets, with preset palettes applying consistently across all nodes, making it easy to rebrand an entire cockpit layout without editing each node individually.
 
@@ -12,7 +12,7 @@
 
 **Vizlet-Wide Shared Locals** — see [below](#vizlet-wide-shared-locals).
 
-**Multi-Game Support** — StarVizion's input capture is already game-agnostic; mode detection is game-specific (Elite Dangerous only in v1). Extending mode detection to other cockpit games is a future direction.
+**Mode Detection for More Games** — StarVizion's input capture is game-agnostic, and mode detection comes from providers. The first release has it for Elite Dangerous only, through the Elite Intel plugin; providers for other games add it there.
 
 **CortexUnit (Reusable/Shareable Vizlet Templates)** — see [below](#cortexunit-reusableshareable-vizlet-templates).
 
@@ -22,7 +22,7 @@
 
 **Prerequisite substantially satisfied, but CortexUnit's own design has not started — and that's fine, it's confirmed low-priority, not something to pick up right away.** CortexUnit's actual shape — what exactly gets templated (a whole Vizlet? a single NeuroNode? a reusable named group of nodes? possibly a whole HoloFrame, which raises the question of whether it replaces HoloFrames' existing plain export/import entirely), what's parameterized versus fixed at template-definition time, and how a placed instance relates back to its template after import — was blocked on StarVizion's own foundational structure being broken down first. That breakdown (every NeuroNode primitive, the Vizlet Editor's structure, Live/Static mode, HoloFrames, frame-rate input, keyboard capture, and VR rendering modes) is now largely done — see [Vizlets and the Node System](vizlet-and-node-system.md), [UI Layout](ui-layout.md), and [HoloFrames and Persistence](holoframes-and-persistence.md). The prerequisite being satisfied just means CortexUnit *could* be designed whenever it's actually wanted — it doesn't make it a priority.
 
-An earlier design pass used this same name for a similar idea — a reusable, parameterized node template with per-instance parameter overrides (e.g., a "Throttle Arc" template with an overridable color and radius) — described using different underlying terminology (**NeuroFrame** instead of the current **NeuroNode**, **VizCluster** instead of **HoloFrame**, which itself was called **VizLoadout** for most of this documentation pass before being renamed) than the current spec uses. That prior description is a useful reference point, not a locked-in design — see [conflicts-and-open-questions.md](../../99-archive/conflicts-and-open-questions.md#21-cortexunit-reusableshareable-vizlet-template--confirmed-wanted-confirmed-low-priority).
+An earlier design pass used this same name for a similar idea — a reusable, parameterized node template with per-instance parameter overrides (e.g., a "Throttle Arc" template with an overridable color and radius) — described using different underlying terminology (**NeuroFrame** instead of the current **NeuroNode**, **VizCluster** instead of **HoloFrame**, which itself was called **VizLoadout** for most of this documentation pass before being renamed) than the current spec uses. That prior description is a useful reference point, not a locked-in design (recorded in the Elite Intel repository's design archive, `docs/99-archive/conflicts-and-open-questions.md`, item 21).
 
 ### Vizlet-Wide Shared Locals
 
@@ -44,7 +44,7 @@ Decisions needed before implementing either: which option (or both) to support; 
   *interaction* level — what dragging, selecting and editing actually feel like.
 - **Expression editor panel layout.** Docked, floating, or a lightweight popover for the expanded `fx`
   editing surface. Previously deferred to "whichever integrates cleanest with the UI toolkit", which was
-  a Godot-era answer; Elite-Intel is Swing, so it needs a real choice.
+  a Godot-era answer; StarVizion's Rust UI toolkit is not chosen yet, so it needs a real choice.
 - **Default bundled font.** The fallback when a Vizlet's referenced system font is missing on import. A
   HUD or space aesthetic is preferred; nothing is chosen.
 
@@ -53,4 +53,4 @@ Decisions needed before implementing either: which option (or both) to support; 
 
 **Vizlet-wide shared locals, Option A vs. B** — see [above](#vizlet-wide-shared-locals).
 
-Resolved items formerly tracked here — Frame-Rate Polling Ownership (Device Service owns it, shared infrastructure), Global Keyboard Capture (confirmed global/platform-native for v1), and A Full Breakdown of Every Part of a Vizlet (substantially done) — now live in [Vizlets and the Node System](vizlet-and-node-system.md) and [above](#cortexunit-reusableshareable-vizlet-templates).
+Resolved items formerly tracked here — Frame-Rate Polling Ownership (StarVizion's own input layer owns it), Global Keyboard Capture (global/platform-native and opt-in for v1), and A Full Breakdown of Every Part of a Vizlet (substantially done) — now live in [Vizlets and the Node System](vizlet-and-node-system.md) and [above](#cortexunit-reusableshareable-vizlet-templates).

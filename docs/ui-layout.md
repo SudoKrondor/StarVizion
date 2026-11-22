@@ -1,8 +1,8 @@
 # StarVizion — UI Layout
 
-StarVizion occupies Elite-Intel's main tab content area for its editor and management UI. All Vizlet windows themselves float outside the Elite-Intel window, directly on the desktop.
+StarVizion's main window holds its editor and management UI. All Vizlet windows themselves float outside the main window, directly on the desktop (or in VR).
 
-## Left Navigation (Within the StarVizion Tab)
+## Left Navigation (Within the Main Window)
 
 Two tabs:
 
@@ -66,7 +66,7 @@ The NeuroNode-composition workspace — everything needed to build and edit the 
 
 ### Live Vizlet Context Menu
 
-Right-clicking an active Vizlet's own overlay window — the floating window itself, on the desktop, not anything in the StarVizion tab — opens a small context menu: **Edit** (opens the Vizlet Editor), **Lock/Unlock** (same state as the Vizlet tab's Locked toggle above — a locked overlay can't be dragged), and **Close** (deactivates it, same as the play icon on its library card). This is the live window's own menu, separate from the library card's dots-menu — the two happen to share Edit and Close, but the card's dots-menu also has Delete (removing the Vizlet entirely), which has no place on the live window's menu since deleting a Vizlet that's still running isn't a sensible action from that surface.
+Right-clicking an active Vizlet's own overlay window — the floating window itself, on the desktop, not anything in StarVizion's main window — opens a small context menu: **Edit** (opens the Vizlet Editor), **Lock/Unlock** (same state as the Vizlet tab's Locked toggle above — a locked overlay can't be dragged), and **Close** (deactivates it, same as the play icon on its library card). This is the live window's own menu, separate from the library card's dots-menu — the two happen to share Edit and Close, but the card's dots-menu also has Delete (removing the Vizlet entirely), which has no place on the live window's menu since deleting a Vizlet that's still running isn't a sensible action from that surface.
 
 ## Expression Editing Design
 
@@ -79,17 +79,23 @@ The expression editor is not a modal dialog — it is a persistent panel within 
 
 Each expression field has a control that expands the field into a larger editing surface with: the expression text in a larger input area; a clickable list of all available variables (input bindings, locals, window variables, time variables); a clickable list of available functions; a live current-value readout; and a valid/invalid indicator. The specific layout of this expanded surface (inline expansion, side panel, or popover) is an implementation detail.
 
-## Global Settings (StarVizion Settings Tab)
+## Global Settings
 
-Available in Elite-Intel's Services tab, under the StarVizion section: Vizlet storage folder (default: the `AppPaths` application data folder), HoloFrame storage folder, grid-snapping toggle (editor alignment aid), alignment-guides toggle (smart guides during drag/resize), default node opacity, and an attribution name that appears as the `author` field in new Vizlet files.
+Available in StarVizion's own settings: Vizlet storage folder (default: StarVizion's per-user application data folder), HoloFrame storage folder, grid-snapping toggle (editor alignment aid), alignment-guides toggle (smart guides during drag/resize), default node opacity, and an attribution name that appears as the `author` field in new Vizlet files.
 
 ---
 
 ## Mode-Based Visibility
 
-Vizlets can be configured to show or hide automatically based on what the player is doing in Elite Dangerous. This is a Vizlet-level setting, configured on the [Vizlet Editor's Vizlet tab](#vizlet-tab) — not a per-NeuroNode setting.
+Vizlets can be configured to show or hide automatically based on what the player is doing in-game. This is a Vizlet-level setting, configured on the [Vizlet Editor's Vizlet tab](#vizlet-tab) — not a per-NeuroNode setting.
 
-### Detected Modes (v1)
+### Where Modes Come From
+
+StarVizion itself knows nothing about any game. Game modes are supplied by providers: a provider announces the modes it can detect for its game and reports the current one. With no provider running, there are no detected modes and every Vizlet follows its manual state.
+
+### Elite Dangerous Modes (v1, via the Elite Intel plugin)
+
+The first release ships mode detection for one game, Elite Dangerous: Odyssey, supplied by the bundled Elite Intel plugin from Elite Dangerous journal events:
 
 | Mode | Detection Method |
 |---|---|
@@ -101,13 +107,13 @@ Vizlets can be configured to show or hide automatically based on what the player
 | Docked / Station | Journal docked event |
 | Supercruise | Journal supercruise-entry event |
 
-Mode detection is best-effort. If journal parsing fails or the mode is ambiguous, Vizlets fall back to their manual state (whatever the user last set).
+Mode detection is best-effort. If the provider stops reporting, or the mode is ambiguous, Vizlets fall back to their manual state (whatever the user last set).
 
 ### Per-Vizlet Mode Configuration
 
 Each Vizlet has a mode-visibility setting: always visible (default, independent of detected mode), visible in a user-selected list of modes, or hidden in a user-selected list of modes.
 
-Mode transitions are debounced (a brief delay before changing visibility) to prevent visual flicker during rapid journal events.
+Mode transitions are debounced (a brief delay before changing visibility) to prevent visual flicker during rapid mode changes.
 
 ### Hiding Never Closes a Window
 

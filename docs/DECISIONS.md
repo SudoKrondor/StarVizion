@@ -60,3 +60,19 @@ A setup `.exe` on Windows; `.deb` and `.rpm` on Linux (gamers mostly run Fedora-
 No Flatpak, no Snap, no storefront: a sandbox breaks global input hooks, desktop overlays and talking to other
 local apps such as Elite Intel. Leading candidate tool: `cargo-packager` (NSIS on Windows), built per OS in GitHub
 Actions.
+
+## D7. Game-agnostic: anything game-specific comes from a provider
+
+*Krondor, 2026-11-22.*
+
+StarVizion is not specific to Elite Dangerous. It is hardware visual feedback for any game. StarVizion itself knows
+no game: game data, and the game modes that drive mode-based visibility and HoloFrame switching, come only from
+providers and plugins. The first release ships Elite Dangerous mode detection through the bundled Elite Intel plugin.
+Other developers can write Vizlets and providers for other games against `starvizion-provider-api`.
+
+**Why:** the problem StarVizion solves (seeing your controls when you cannot see your hands) is the same in every
+simulator. Keeping the game out of the core is what lets third-party plugins cover other games without changing
+StarVizion.
+
+**What it supersedes in the carried-over design:** mode detection as a built-in journal parser, and journal and CAPI
+telemetry as StarVizion subsystems.

@@ -115,8 +115,7 @@ Each binding maps a user-chosen variable name to an input source. This is delibe
 | Source Type | Description |
 |---|---|
 | Input | An axis or button on a connected controller, keyboard, or mouse |
-| Journal | A field from Elite Dangerous journal events (future — v1 is input-only; see [Telemetry](../../03-data-models/telemetry.md)) |
-| Data | An external data source (future) |
+| Provider | A field announced by a provider or plugin through `starvizion-provider-api` — game data such as Elite Dangerous fields from the bundled Elite Intel plugin, or anything a third-party developer exposes |
 
 A NeuroNode may also use StarCalc expressions that reference only window or time variables with no device input at all — for example, a Static-mode node that pulses over time.
 
@@ -130,9 +129,9 @@ A single Vizlet can contain any number of NeuroNodes, each bound to a different 
 
 StarVizion reads input from connected devices. Input capture has two distinct concerns handled differently:
 
-**Device enumeration** — discovering available devices, establishing identity, detecting hot-plug events. This is shared infrastructure; StarVizion uses Elite-Intel's Device Service (`elite.intel.devices`) for this, exactly as every other Elite-Intel consumer of device input already does. There is no reason to duplicate device discovery.
+**Device enumeration** — discovering available devices, establishing identity, detecting hot-plug events. StarVizion owns this itself, in its input layer (`crates/input`), on Windows and Linux. It does not depend on any other application's device service.
 
-**Frame-rate polling** — reading axis values and button states at rendering frame rate (60–144+ times per second) to drive NeuroNode expressions. **Confirmed: the Device Service itself provides this as a high-frequency input stream**, shared infrastructure any Elite-Intel feature can use — not something StarVizion builds and owns on its own. This was an open item; it's resolved specifically because StarVizion is not the only feature with a plausible reason to want it — BindForge visualizing live axis/button movement in its own UI is a real, wanted use case (not yet designed, but real), and other Elite-Intel features may want the same. Building it once, centrally, is consistent with how Elite-Intel already treats `elite.intel.devices` as shared infrastructure — see [Vision — History](../../00-overview/vision.md).
+**Frame-rate polling** — reading axis values and button states at rendering frame rate (60–144+ times per second) to drive NeuroNode expressions. StarVizion's input layer owns this too, as a high-frequency input stream feeding the render loop.
 
 ### Supported Input Sources
 
@@ -151,18 +150,18 @@ expansion has to happen. It is not free, and nothing downstream should assume th
 
 ### Polling Requirement
 
-Regardless of which layer owns the polling, axis and button state must be available at render frame rate with no measurable latency added to the game's own input processing. Polling must be non-blocking. If all bindings to a device are removed, polling for that device should stop.
+Axis and button state must be available at render frame rate with no measurable latency added to the game's own input processing. Polling must be non-blocking. If all bindings to a device are removed, polling for that device should stop.
 
 ### Multi-Device Identity
 
-When the user has two physically identical controllers (e.g., dual identical HOTAS sticks), StarVizion must distinguish them. Device identity is established by the Device Service using vendor ID, product ID, and connection order/port path — a port path is required to disambiguate, since VID/PID alone cannot tell two identical-model devices apart (Elite Dangerous's own `.binds` files have the same limitation — see [BindForge's binding schema](../../03-data-models/binding-schema.md#device-identity)). Vizlet data stores that identity so Vizlets reload correctly across sessions.
+When the user has two physically identical controllers (e.g., dual identical HOTAS sticks), StarVizion must distinguish them. Device identity is established by StarVizion's input layer using vendor ID, product ID, and connection order/port path — a port path is required to disambiguate, since VID/PID alone cannot tell two identical-model devices apart (some games' own binding files, such as Elite Dangerous's `.binds`, have the same limitation). Vizlet data stores that identity so Vizlets reload correctly across sessions.
 
 ### Hot-Plug
 
-Connect and disconnect events are surfaced by the Device Service. When a bound device disconnects, the affected Vizlets soft-save and close (see [Device Disconnect Behaviour](#device-disconnect-behaviour) above). When the device reconnects, the user re-activates the affected Vizlets manually. There is no automatic resumption.
+Connect and disconnect events are surfaced by StarVizion's input layer. When a bound device disconnects, the affected Vizlets soft-save and close (see [Device Disconnect Behaviour](#device-disconnect-behaviour) above). When the device reconnects, the user re-activates the affected Vizlets manually. There is no automatic resumption.
 
-### Keyboard Capture — Confirmed Global, v1
+### Keyboard Capture — Global, Opt-In, v1
 
 Input APIs generally only report keyboard state while the capturing application's own window has focus. True global (focus-independent) keyboard capture is a separate, harder problem, requiring a platform-native low-level input hook. This is a confirmed, well-diagnosed limitation from prior research on this exact feature — a prior prototype's keyboard-visualization Vizlet never worked, and even once its immediate cause was fixed, focus-scoping would have remained a second, unresolved problem.
 
-**Confirmed for the first release: a platform-native global keyboard hook, not focus-scoped-only capture.** A HUD meant to stay visible while Elite Dangerous has focus is useless if it can only see keystrokes while its own window is focused instead, so focus-scoped-only was never a real option for v1. A low-level global hook only *observes* keystrokes — it does not consume or intercept them, so the game continues receiving every keystroke completely normally; nothing is stolen from it, the same way a screen recorder can see the screen without blocking anything else from also seeing it. This is resolved as part of the Device Service's own design, since it's the same shared input infrastructure covering frame-rate polling above — not decided independently by StarVizion.
+**Confirmed for the first release: a platform-native global keyboard hook, not focus-scoped-only capture.** A HUD meant to stay visible while the game has focus is useless if it can only see keystrokes while its own window is focused instead, so focus-scoped-only was never a real option for v1. A low-level global hook only *observes* keystrokes — it does not consume or intercept them, so the game continues receiving every keystroke completely normally; nothing is stolen from it, the same way a screen recorder can see the screen without blocking anything else from also seeing it. It lives in StarVizion's own input layer alongside frame-rate polling. It is **off until the user turns it on** (see [Decisions — D5](DECISIONS.md#d5-keyboard-capture-is-opt-in)): on Linux it needs evdev access the user must grant, and keylogger-shaped access should be explained, not assumed.

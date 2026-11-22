@@ -4,13 +4,13 @@
 
 *(Named VizLoadout in earlier design generations — renamed for clarity; same underlying concept.)*
 
-A **HoloFrame** is a named group of Vizlets that can be activated together as a set with a single action — the equivalent of switching a control loadout in Elite Dangerous, but for the player's visual overlay configuration.
+A **HoloFrame** is a named group of Vizlets that can be activated together as a set with a single action — the equivalent of switching a control loadout in a game, but for the player's visual overlay configuration.
 
 **What it contains:** a list of Vizlet IDs. It records which Vizlets belong to the group and does not store those Vizlets' content — each Vizlet owns its own definition. A HoloFrame is a grouping mechanism only, not a container.
 
 **Activating/deactivating:** activating a HoloFrame shows all member Vizlets in their saved screen positions. Deactivating it hides them all. Neither ever closes a member Vizlet's window — see [UI Layout — Hiding Never Closes a Window](ui-layout.md#hiding-never-closes-a-window). Individual Vizlets can be added to or removed from a HoloFrame at any time.
 
-**Multiple HoloFrames:** a user may have several — one for ship flight, one for on-foot, one for SRV. **Automatic HoloFrame switching, based on the same journal-detected game mode used for per-Vizlet Mode-Based Visibility, is a v1 requirement** — earlier drafts of this documentation called this a future direction; it's since been confirmed as needed for v1. Manual activation remains available regardless of whether a HoloFrame has a mode assignment.
+**Multiple HoloFrames:** a user may have several — one for ship flight, one for on-foot, one for SRV. **Automatic HoloFrame switching, based on the same provider-detected game mode used for per-Vizlet Mode-Based Visibility, is a v1 requirement** — earlier drafts of this documentation called this a future direction; it's since been confirmed as needed for v1. Manual activation remains available regardless of whether a HoloFrame has a mode assignment.
 
 ### Mode-Based HoloFrame Switching
 
@@ -22,13 +22,13 @@ A HoloFrame with no mode assignment behaves exactly as it always has — manual 
 
 ### Render Mode Override
 
-A HoloFrame can optionally set a [Render Mode](../../02-features/starvizion/vr-overlay.md#rendering-modes) (Desktop, VR, Desktop + VR, or Desktop+) that applies to every member Vizlet uniformly — the same precedence pattern as Mode-Based HoloFrame Switching above: while a Vizlet belongs to a HoloFrame with a Render Mode override set, that override governs how the Vizlet renders, and its own individually-configured Render Mode is not consulted. A HoloFrame with no Render Mode override leaves each member's own individual setting untouched.
+A HoloFrame can optionally set a [Render Mode](vr-overlay.md#rendering-modes) (Desktop, VR, Desktop + VR, or Desktop+) that applies to every member Vizlet uniformly — the same precedence pattern as Mode-Based HoloFrame Switching above: while a Vizlet belongs to a HoloFrame with a Render Mode override set, that override governs how the Vizlet renders, and its own individually-configured Render Mode is not consulted. A HoloFrame with no Render Mode override leaves each member's own individual setting untouched.
 
 This is deliberately whole-group, not per-member — a HoloFrame is the grouping of Vizlets, so its settings apply to the group as a set. A player who wants some Vizlets in what they think of as one set to render differently than others splits that into two HoloFrames rather than expecting mixed behaviour inside one; the same answer already applies to visibility, and there's no reason Render Mode should work differently.
 
 **Deleting a HoloFrame:** removes the grouping only, with confirmation. Since a HoloFrame never owns Vizlet content — it only references Vizlet IDs — deleting one never deletes the member Vizlets themselves; they remain in the Vizlet library, untouched, just no longer grouped under the deleted HoloFrame.
 
-**Storage:** HoloFrames are stored as individual document files in a user-configurable folder managed by Elite-Intel's application path resolver (`AppPaths`), named the same way Vizlets are — see the filename convention below.
+**Storage:** HoloFrames are stored as individual document files in a user-configurable folder, defaulting to StarVizion's per-user application data folder, named the same way Vizlets are — see the filename convention below.
 
 ## Vizlet Persistence
 
@@ -44,7 +44,7 @@ Every Vizlet is stored as its own document file. There is no unsaved state — e
 
 Malformed node entries are logged and skipped on load; other nodes in the same Vizlet continue to load normally. A fully Static node with no input bindings — for example, a fixed background shape defined entirely by constant expressions — is a completely ordinary Vizlet entry; no separate "static node type" exists (see [Vizlets and the Node System](vizlet-and-node-system.md#node-system)).
 
-**Storage location:** a user-configurable folder, defaulting to a location managed by Elite-Intel's application path resolver (`AppPaths`).
+**Storage location:** a user-configurable folder, defaulting to StarVizion's per-user application data folder.
 
 **Corrupt or missing files:** if a Vizlet's file is missing or unreadable when a HoloFrame is activated, that specific Vizlet is skipped and logged; other Vizlets in the HoloFrame load normally, and the editor shows a warning badge on the affected entry.
 

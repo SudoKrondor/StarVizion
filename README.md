@@ -8,6 +8,9 @@ nor an end stop and cannot see their own hands.
 StarVizion is read-only. It never sends, intercepts or remaps input, never touches the game's
 files, and never interacts with the game process.
 
+StarVizion is a standalone application for Windows and Linux, written in Rust. It is not tied to
+any one game: controller visualization works whatever you are playing.
+
 **Status:** scaffold only. Development starts after Elite Intel 1.2 ships (December 2026).
 
 ## Standalone, with plugins
@@ -17,10 +20,11 @@ your controllers' live state, group them into HoloFrames and show them on the de
 
 Everything beyond that comes in through **providers**: a provider announces the fields it offers
 and streams their values, and Vizlets bind to them like any controller axis. Any developer can write
-one, in any language, against [`starvizion-provider-api`](crates/provider-api).
+one, in any language, against [`starvizion-provider-api`](crates/provider-api), to bring data from
+any game or tool into StarVizion.
 
-**Elite Intel** integration is one such plugin, shipped with StarVizion. It stays idle until Elite
-Intel is running. Neither app needs the other: some pilots will run only one of them.
+**Elite Intel** integration is one such plugin, shipped with StarVizion, for Elite Intel 2.0. It stays
+idle until Elite Intel is running. Neither app needs the other: some pilots will run only one of them.
 
 ## Layout
 
@@ -51,10 +55,12 @@ Windows and Linux. Installers: a setup `.exe` on Windows, `.deb` and `.rpm` on L
 
 ## Design
 
-The design was written while StarVizion was planned as a feature inside Elite Intel, and lives in
-the Elite Intel repository under `docs/02-features/starvizion/`. Its product design still holds;
-where it assumes Elite Intel as the host (Swing, Elite Intel's device service and paths), it is
-superseded by [docs/DECISIONS.md](docs/DECISIONS.md).
+The product design lives in [`docs/`](docs), starting at [docs/overview.md](docs/overview.md).
+Why StarVizion is shaped this way is in [docs/DECISIONS.md](docs/DECISIONS.md).
+
+The design was first written while StarVizion was planned as a feature inside Elite Intel. It has
+been carried over here and revised for StarVizion as a standalone application; the Elite Intel
+repository's `docs/02-features/starvizion/` copy is historical.
 
 ## Licence
 

@@ -37,7 +37,7 @@ An invalid expression is flagged in the editor with a visual indicator on the no
 
 ## Telemetry Expressions (Future)
 
-When game telemetry is integrated (see [Telemetry](../../03-data-models/telemetry.md)), StarCalc expressions will be able to reference journal-derived fields — ship status, cargo load, current game mode. In v1, StarCalc operates on controller input only.
+StarCalc expressions can reference fields announced by providers the same way they reference a controller axis — for example ship status, cargo load or current game mode from the Elite Intel plugin, or any field a third-party provider offers for another game. Which fields exist depends entirely on which providers are running; StarCalc itself knows no game.
 
 ---
 
