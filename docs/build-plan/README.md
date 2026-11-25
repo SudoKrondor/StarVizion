@@ -61,7 +61,7 @@ In build order. A section can start once what it depends on has the slices it ne
 | Model and files | `model.md` | `crates/model` | `vizlet-and-node-system.md`, `holoframes-and-persistence.md` | StarCalc | not started |
 | Render and editor | `render.md` | `crates/render`, `crates/starvizion` | `ui-layout.md`, `vizlet-and-node-system.md` | UI toolkit decision, Model | not started |
 | VR | `vr.md` | `crates/vr` | `vr-overlay.md` | Render, VR runtime decision | not started |
-| Plugins | `plugins.md` | `crates/provider-api` | `DECISIONS.md` D8 | Model; starts with the D8 spike | not started |
+| Plugins | `plugins.md` | `crates/provider-api` | `DECISIONS.md` D8, `plugin-development.md` | Model; starts with the D8 spike | not started |
 | Elite Intel plugin | `elite-intel.md` | `plugins/elite-intel` | `DECISIONS.md` D4, D7 | Plugins, Elite Intel 2.0 instrumentation | not started |
 | Packaging | `packaging.md` | workspace | `DECISIONS.md` D6 | a runnable app | not started |
 

@@ -43,4 +43,5 @@ StarVizion is not tied to any one game. Controller visualization is game-agnosti
 - [UI Layout](ui-layout.md) — the editor UI and mode-based visibility system
 - [VR Overlay](vr-overlay.md) — desktop vs. VR rendering
 - [Roadmap](roadmap.md) — features beyond the first release, and open questions
+- [Plugin Development](plugin-development.md) — what writing a plugin looks like for a third-party developer (first cut, changing with the R&D)
 - [Decisions](DECISIONS.md) — why StarVizion is a standalone Rust application, and the other architectural decisions
