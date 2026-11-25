@@ -269,7 +269,8 @@ DO NOT:
 - The provider wire protocol, once it exists, follows the same rule: an additive field changes every message that
   carries it, so call it out and check the consumers.
 - Vizlet and HoloFrame files (`.vizlet.json`, `.holoframe.json`) are user data. Never break loading of a file an
-  earlier release wrote; a format change carries a version and a migration from the previous one.
+  earlier release wrote; a format change carries a version and a migration from the previous one. This applies
+  from 1.0 on: before it, formats change freely (D9 in `docs/DECISIONS.md`).
 - Work branches off `main` and merges back into it through a pull request.
 
 ## Security

@@ -12,6 +12,57 @@ StarCalc expressions are evaluated per frame. Supported constructs:
 - **Ternary:** `condition ? valueIfTrue : valueIfFalse`
 - **Built-in functions:** `sin()`, `cos()`, `tan()`, `abs()`, `min()`, `max()`, `clamp()`, `round()`, `floor()`, `ceiling()`, `sqrt()`, `ln()`, `log10()`, `atan2()`
 - **Input references:** user-named variables bound to device inputs (axes as floats −1.0 to 1.0, buttons as booleans)
+- **Colors:** written bare, `#RRGGBB` or `#RRGGBBAA` (see [Color Values](#color-values-in-expressions))
+- **Text:** string literals in double quotes, `"Speed: "` (see [Text Values](#text-values))
+
+## Language Rules
+
+*Settled by Krondor, 2026-11-24.*
+
+**Style.** StarCalc follows the C family (C, Java, Kotlin, JavaScript, C#) wherever the syntax above does not say
+otherwise, so people who already write code in one of those find nothing new. Names are case-sensitive: `Throttle`
+and `throttle` are different variables.
+
+**Precedence**, tightest first:
+
+| Level | Operators | Associativity |
+|---|---|---|
+| 1 | `^` (power) | right: `2^3^2` is `2^9` |
+| 2 | unary `-`, `!` | right |
+| 3 | `*`, `/`, `%` | left |
+| 4 | `+`, `-` | left |
+| 5 | `<`, `<=`, `>`, `>=` | left |
+| 6 | `==`, `!=` | left |
+| 7 | `&&` | left |
+| 8 | `\|\|` | left |
+| 9 | `? :` | right |
+
+`^` binds tighter than unary minus, as in mathematics and Python: `-2^2` is `-4`. Parentheses override everything.
+
+**Types must match.** StarCalc has four value types: number, boolean, color and text. Nothing converts
+implicitly:
+- `true + 1` is an error, and so is `"5" == 5`.
+- Both branches of `? :` must have the same type, and the condition must be a boolean.
+- Arithmetic takes numbers. `&&`, `||` and `!` take booleans. `<`, `<=`, `>` and `>=` compare numbers.
+- `==` and `!=` compare two values of the same type.
+- `+` also joins two texts. Converting a number to text is explicit: see [Text Values](#text-values).
+
+Type errors are found as the expression is typed, not while it runs.
+
+**Names are strict.**
+- A binding or local cannot reuse a reserved name, a function name, or the name of another binding or local in
+  the same NeuroNode.
+- `t` exists only inside a Parametric primitive's `x` and `y` expressions.
+
+These rules are the strict starting point and may be relaxed before 1.0 (see
+[Decisions — D9](DECISIONS.md#d9-no-compatibility-obligations-before-10)).
+
+**Runtime failures.**
+- Division by zero, an infinite result or a NaN result (for example `sqrt(-1)` or `ln(0)`) fails the expression.
+  Nothing infinite or NaN ever reaches a NeuroNode property.
+- `%` keeps the sign of the left operand, as in the C family: `-7 % 3` is `-1`. `x % 0` fails, like division
+  by zero.
+- `round` sends halves away from zero: `round(2.5)` is `3`, `round(-2.5)` is `-3`.
 
 ## Local (Intermediate) Expressions
 
@@ -33,7 +84,13 @@ For Parametric primitives, StarCalc is evaluated in a loop — the sweep paramet
 
 ## Error Handling
 
-An invalid expression is flagged in the editor with a visual indicator on the node. At runtime, a failed expression displays a fallback placeholder value and logs the error. A failed expression on one node does not affect other nodes.
+An invalid expression is flagged in the editor with a visual indicator on the node. A failed expression on one node does not affect other nodes.
+
+**At runtime** (*settled by Krondor, 2026-11-24*), a failure is handled once, where a NeuroNode's expressions are evaluated. Whatever draws a node always receives a plain value and never checks for failure itself:
+- A property whose expression fails keeps its **last good value**, so the overlay does not flicker.
+- If the expression has never succeeded, the property takes its fixed default value. For a text property that is `""`.
+- A local that fails fails every expression that uses it, and each of those falls back the same way.
+- The NeuroNode is flagged for the editor, and the error is logged when it starts, not on every frame.
 
 ## Telemetry Expressions (Future)
 
@@ -86,6 +143,13 @@ In addition to the standard math functions above, StarCalc provides:
 | `lerp(a, b, factor)` | Linear interpolation from a to b by the given factor |
 | `map(v, inMin, inMax, outMin, outMax)` | Remap a value from one range to another — for example, translating a raw axis range into a pixel range in one call |
 | `smooth(value, speed)` | Exponential smoothing that damps sudden changes over time; `speed` is a unitless strength value from 0.0 (no smoothing) to 10.0 (heavy, slow, floaty smoothing) |
+| `format(number, decimals)` | Convert a number to text with a fixed number of decimal places: `format(0.756, 1)` is `"0.8"` (see [Text Values](#text-values)) |
+
+**`smooth()` behaviour** (*settled by Krondor, 2026-11-24, leaning to performance*):
+- Each `smooth()` call in an expression keeps its own state, in a slot fixed when the expression is compiled. Two calls in one expression never share it, and a frame costs no lookup.
+- On its first frame it returns its input unchanged, so nothing slides in from 0.
+- `speed` 0.0 returns the input unchanged. Higher values damp harder.
+- The damping uses `deltaTime`, so it feels the same at 90 Hz and 144 Hz. The exact mapping from `speed` to a time constant is set when `smooth()` is built and recorded here.
 
 ### Reserved Names
 
@@ -97,4 +161,15 @@ In addition to the standard math functions above, StarCalc provides:
 
 ### Color Values in Expressions
 
-Color properties accept hex strings, and expressions can produce a color string conditionally (for example, a color that switches based on a button state). Supported formats: `#RRGGBB` and `#RRGGBBAA`.
+Colors are their own value type, written bare with no quotes (*settled by Krondor, 2026-11-24*): `#FF8800` or `#FF880080`. Expressions can produce a color conditionally, for example `fire ? #FF0000 : #00FF00` for a color that switches with a button state. Colors can be compared with `==` and `!=` and chosen with `? :`. They take part in no arithmetic.
+
+### Text Values
+
+*Settled by Krondor, 2026-11-24.*
+
+Text properties, such as a Text primitive's content, take text values:
+- **Literals** are written in double quotes: `"Speed: "`.
+- **`+` joins** two texts: `"Speed: " + format(speed, 1)`.
+- **Numbers become text only through `format()`.** `"Speed: " + speed` is a type error.
+- **Numbers are formatted US-style** whatever the operating system's locale: `.` for decimals and no thousands separator, so `format(1234.5, 2)` is `"1234.50"`. The first release is not localized (see [Decisions — D10](DECISIONS.md#d10-the-first-release-is-not-localized)).
+- **A failed text expression** shows its last good text, or `""` if it has never had one (see [Error Handling](#error-handling)). StarCalc has no null.

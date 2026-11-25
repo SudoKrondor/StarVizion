@@ -114,3 +114,25 @@ local socket, using the same field and card model, may become a second tier late
 
 **What it supersedes:** "any language" in `README.md`, which assumed an interface that no language-neutral
 mechanism backed.
+
+## D9. No compatibility obligations before 1.0
+
+*Krondor, 2026-11-24.*
+
+Until StarVizion 1.0 is released, everything is in-house. The StarCalc language, the Vizlet and HoloFrame file
+formats and other user-facing formats may change without migrations or backward compatibility. From 1.0 on, the
+compatibility rules in `docs/CODING_STANDARD.md` (API & Compatibility) apply in full. `starvizion-provider-api`
+keeps the rule in `CLAUDE.md`.
+
+**Why:** nobody outside the project has files or habits to break yet. Settling the language and formats by use,
+before 1.0, beats carrying early guesses forever.
+
+## D10. The first release is not localized
+
+*Krondor, 2026-11-24.*
+
+The first release is in English and formats numbers US-style (`.` for decimals) whatever the operating system's
+locale.
+
+**Why:** Rust's standard library cannot format by locale, and doing it properly needs large dependencies (ICU4X).
+Nothing compelling justifies that cost before the product exists.
