@@ -76,3 +76,41 @@ StarVizion.
 
 **What it supersedes in the carried-over design:** mode detection as a built-in journal parser, and journal and CAPI
 telemetry as StarVizion subsystems.
+
+## D8. Third-party plugins are WebAssembly components; StarVizion renders their cards
+
+*Krondor, 2026-11-24.*
+
+A third-party plugin is a `.svplugin` file: a zip holding `manifest.toml` (id, name, version, author, provider API
+version, requested permissions), `plugin.wasm` (a WebAssembly component) and `assets/`. StarVizion runs it in an
+embedded WebAssembly runtime (`wasmtime`). The contract is a versioned WIT interface (`starvizion:provider@1.0.0`),
+which is what `starvizion-provider-api` publishes. A plugin describes the fields it offers, streams their values and
+emits cards. Rust is the first-class plugin language. Any language that builds a WebAssembly component (JavaScript,
+Python, Go, C/C++, C#) can also be used.
+
+The user picks a `.svplugin` file from the StarVizion UI, sees what it asks to access (files, local network ports)
+and approves it. Its Vizlet templates then appear in the Vizlet palette and are placed on the canvas like any other
+Vizlet. The plugin sends data and declarative cards (text, gauges, lists, images). StarVizion's Vizlets render them,
+so no plugin touches the GPU or the render thread.
+
+Plugins StarVizion bundles and whose other side we own, such as Elite Intel (D4), are first-party Rust built into
+StarVizion. They connect to their application themselves. Running applications that feed StarVizion directly over a
+local socket, using the same field and card model, may become a second tier later. That is not decided yet.
+
+**Why:**
+- Rust has no stable ABI, so native Rust plugins would only load safely when built with StarVizion's exact compiler
+  and crate versions.
+- Native plugins need a separate build for each OS. They also run in-process, where a panic or a blocking call
+  freezes the render loop and the VR overlay.
+- StarVizion cannot make downloaded native code honour "read-only towards games". A sandbox that grants only declared
+  permissions can.
+- Python or JavaScript run as a plain script would make users install a runtime. A component bundles it, so one file
+  works on Windows and Linux.
+
+**Risks to prove before the API is published:**
+- WASI sockets and file access are newer parts of the standard. Prototype one Rust plugin and one Python plugin that
+  read a game file and talk to a local port.
+- Python plugins bundle an interpreter (tens of MB), and most packages with C extensions will not work in them.
+
+**What it supersedes:** "any language" in `README.md`, which assumed an interface that no language-neutral
+mechanism backed.

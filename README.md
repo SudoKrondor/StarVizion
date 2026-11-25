@@ -20,10 +20,17 @@ your controllers' live state, group them into HoloFrames and show them on the de
 
 Everything beyond that comes in through **providers**: a provider announces the fields it offers
 and streams their values, and Vizlets bind to them like any controller axis. Any developer can write
-one, in any language, against [`starvizion-provider-api`](crates/provider-api), to bring data from
-any game or tool into StarVizion.
+one against [`starvizion-provider-api`](crates/provider-api), to bring data from any game or tool
+into StarVizion.
 
-**Elite Intel** integration is one such plugin, shipped with StarVizion, for Elite Intel 2.0. It stays
+A third-party plugin is a single `.svplugin` file: a WebAssembly component plus a manifest. Write it
+in Rust, or in any language that builds a WebAssembly component (JavaScript, Python, Go, C/C++, C#).
+The same file runs on Windows and Linux. Users add it from the StarVizion UI and approve what it
+asks to access. Its Vizlets then appear in the palette, ready to place on the canvas. Plugins send
+data and cards, and StarVizion draws them on the desktop and in VR. See
+[D8](docs/DECISIONS.md#d8-third-party-plugins-are-webassembly-components-starvizion-renders-their-cards).
+
+**Elite Intel** integration is a first-party plugin, written in Rust and built into StarVizion, for Elite Intel 2.0. It stays
 idle until Elite Intel is running. Neither app needs the other: some pilots will run only one of them.
 
 ## Layout
