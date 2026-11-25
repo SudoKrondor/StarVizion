@@ -23,6 +23,23 @@ StarCalc expressions are evaluated per frame. Supported constructs:
 otherwise, so people who already write code in one of those find nothing new. Names are case-sensitive: `Throttle`
 and `throttle` are different variables.
 
+**Lexical rules** (*settled by Krondor, 2026-11-24*):
+- **Numbers:** `1`, `1.5`, `.5`, `1e3`, `1.5e-3`. Not `1.`, `1_000`, `1.5.2` or a number run into a name
+  (`2pi`). A minus sign is an operator, not part of the number. A number too large to represent is an error.
+- **Names:** an ASCII letter or `_`, then letters, digits or `_`. `true` and `false` are the boolean literals.
+  `True` is just a name.
+- **Colors:** `#` and exactly 6 or 8 hex digits, in either case.
+- **Text:** double quotes, with the escapes `\"`, `\\` and `\n`. A raw line break inside quotes is an error that
+  says to use `\n` instead, so a Windows `\r\n` pasted into text never hides in it.
+- **Whitespace:** spaces, tabs and line breaks (`\n` and `\r`) separate tokens and are otherwise ignored, so
+  expressions pasted from Windows parse the same.
+- **Comments:** none yet. `//` and `/*` give a "comments are not supported" error, which keeps that syntax free
+  for C-style comments if they are added.
+- **Nesting:** expressions nest at most 64 levels deep (parentheses, calls, conditionals, unary operators and
+  exponents each add one). Deeper nesting is an error, not a crash, because Vizlet files can be imported from
+  other people.
+- Lone `&`, `|` and `=` are errors that suggest `&&`, `||` and `==`.
+
 **Precedence**, tightest first:
 
 | Level | Operators | Associativity |

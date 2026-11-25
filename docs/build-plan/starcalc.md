@@ -25,19 +25,21 @@ StarCalc knows nothing about windows, devices, files or any game.
 | Path | What it is | Slice |
 |---|---|---|
 | `crates/starcalc/Cargo.toml` | Crate manifest, no dependencies | scaffold |
-| `crates/starcalc/src/lib.rs` | Crate doc comment only | scaffold |
+| `crates/starcalc/src/lib.rs` | Crate doc, `#![forbid(unsafe_code)]`, public re-exports | 1 |
+| `crates/starcalc/src/color.rs` | `Color` (RGBA), read from `#RRGGBB`/`#RRGGBBAA` | 1 |
+| `crates/starcalc/src/error.rs` | `Span`, `ParseError`, `ParseErrorKind` with editor messages | 1 |
+| `crates/starcalc/src/lexer.rs` | Tokens and `tokenize` (crate-private) | 1 |
+| `crates/starcalc/src/parser.rs` | `parse`, the `Expr` tree (`ExprKind`, `UnaryOp`, `BinaryOp`), the nesting limit | 1 |
 
 ## Open questions
 
 Gaps the design doc still leaves. Each is settled in the slice named, and the answer goes into
 `docs/starcalc-expression-engine.md` with its date before the question is removed here.
 
-1. **Lexical details.** Number literal forms (`1`, `1.5`, `.5`, `1e3`?), identifier characters, and whether
-   comments exist. Follow the C family (Language Rules). Settled in slice 1.
-2. **`smooth()` time constant.** The exact mapping from `speed` 0.0-10.0 to a time constant. The rest of its
+1. **`smooth()` time constant.** The exact mapping from `speed` 0.0-10.0 to a time constant. The rest of its
    behaviour is settled in the design doc. Settled in slice 4.
 
-Settled 2026-11-24 and recorded in the design doc: precedence and associativity, case sensitivity, bare color
+Settled 2026-11-24 and recorded in the design doc: lexical rules and the nesting limit, precedence and associativity, case sensitivity, bare color
 literals, strict typing, strict name rules, runtime failures, `%` and `round`, `smooth()` state, the fallback for
 failed expressions, and text values.
 
@@ -45,11 +47,24 @@ failed expressions, and text values.
 
 Hand-off notes, newest first:
 
+- 2026-11-24, slice 1 done.
+  - Decided: the lexical rules and the 64-level nesting limit, in the design doc's Language Rules. CRLF is
+    whitespace, a raw line break in text is an error, and `//` and `/*` are reserved with a "not supported"
+    error.
+  - Found: `parse`, `Expr`, `ExprKind`, `UnaryOp`, `BinaryOp`, `Span`, `ParseError`, `ParseErrorKind` and
+    `Color` are `pub` so the lib build does not flag them as unused. Slice 2 can make `compile` the entry point
+    and narrow the rest (D9 allows that before 1.0).
+  - For slice 2: `pi`, `e`, window and time variables are plain `ExprKind::Name`s, so slice 2 resolves them.
+    `ExprKind::Call` carries `name_span` for "unknown function" and arity errors. Comparisons chain
+    syntactically (`a < b < c` parses), so slice 2's type check rejects them.
+  - Not this section: cargo warns about unused workspace dependencies in `crates/starvizion/Cargo.toml` and
+    `plugins/elite-intel/Cargo.toml` (scaffold). It doesn't fail clippy. They go away as those crates are built.
+
 - 2026-11-24: the user settled the open questions on precedence, types, names, failures, `smooth()`, fallback and
   text. All are recorded in `docs/starcalc-expression-engine.md` (Language Rules, Error Handling, Helper
   Functions, Color Values, Text Values), along with D9 and D10. Slice 7 is no longer blocked.
 
-### 1. Lexer and parser: **next**
+### 1. Lexer and parser: **done** 2026-11-24
 
 Produces: source text to a syntax tree. Covers number and boolean literals, bare color literals, quoted text
 literals, identifiers, all operators from the doc, the ternary, parentheses and function calls, with the
@@ -57,9 +72,9 @@ precedence table in Language Rules. Parse errors carry a byte span and a message
 Typed errors, `#![forbid(unsafe_code)]`.
 
 Done when: unit tests cover every row of the precedence table, `-2^2`, every literal form and each kind of parse
-error with its span. Open question 1 is settled in the design doc.
+error with its span. The lexical details are settled in the design doc.
 
-### 2. Validation and compilation: todo
+### 2. Validation and compilation: **next**
 
 Produces: a syntax tree, checked against a context description, becomes a compiled expression with a known result
 type (number, boolean, color, text). The context is the node's bindings with their kinds, the locals defined so
@@ -86,7 +101,7 @@ fixed at compile time, driven by `deltaTime`.
 
 Done when: tests feed known values over simulated frames and check speed 0.0 (no smoothing), a middle value and
 10.0, the first-frame value, that 90 Hz and 144 Hz converge alike, and that call sites are independent. Open
-question 2 is settled in the design doc.
+question 1 is settled in the design doc.
 
 ### 5. NeuroNode evaluation: todo
 
