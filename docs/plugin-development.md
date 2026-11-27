@@ -62,10 +62,14 @@ official local API. If a game exposes data only through its memory, StarVizion c
 | Kind | Who writes it | How it runs | Status |
 |---|---|---|---|
 | **Third-party plugin** | Anyone | A `.svplugin` file: a WebAssembly component in StarVizion's sandbox | **Settled** (D8). This document. |
-| **Bundled plugin** | The StarVizion project | Native Rust, built into StarVizion, for integrations whose other side we own (Elite Intel, [D4](DECISIONS.md#d4-elite-intel-is-a-bundled-plugin-elite-intel-20-integrates)) | **Settled** (D8). Not open to third parties. |
+| **Bundled plugin** | The StarVizion project | A `.svplugin` like any other, in the same sandbox, shipped with StarVizion already installed and approved (Elite Intel, [D4](DECISIONS.md#d4-elite-intel-is-a-bundled-plugin-elite-intel-20-integrates); FrameShift) | **Settled** ([D12](DECISIONS.md#d12-our-game-data-overlays-are-plugins-hardware-visualization-is-built-in)). |
 | **Feeding application** | Anyone | A running application sends fields and cards to StarVizion over a local socket | **Open.** May become a second tier later (D8). |
 
-Bundled plugins and third-party plugins use the same field, mode and card model. To a pilot they look the same.
+Bundled plugins and third-party plugins are built the same way, against the same API, and run in the same sandbox.
+To a pilot they look the same.
+
+Hardware visualization is not a plugin. It is part of StarVizion, driven by StarVizion's own input capture, and
+works with no plugin installed. No plugin sees controller input ([D12](DECISIONS.md#d12-our-game-data-overlays-are-plugins-hardware-visualization-is-built-in)).
 
 ---
 
@@ -240,8 +244,8 @@ gauges, lists, images. **The element set is proposed.)**
 
 | Element | Holds |
 |---|---|
-| `text` | a string, with size, weight and colour |
-| `gauge` | a value, a range, and an optional label and unit |
+| `text` | a string, with size, weight and an optional colour role |
+| `gauge` | a value, a range, an optional label and unit, and an optional colour role |
 | `list` | rows of elements |
 | `stack` | elements laid out vertically or horizontally |
 | `image` | a file from the plugin's `assets/` |
@@ -249,11 +253,39 @@ gauges, lists, images. **The element set is proposed.)**
 A card has an id; sending a card with the same id replaces it. A card has no scripts, no HTML and no free-form
 drawing. That keeps it cheap to render in VR and safe to accept from untrusted code.
 
+**Colour comes from the pilot's theme, not the plugin. (Settled, D11)** A card element names a colour role, and
+StarVizion takes the actual colour from the active theme. A card cannot carry a literal colour. Cards from every
+plugin therefore match each other and the pilot's own Vizlets, whether they are matched to the game's HUD or to an
+OBS scene. Leave the role out and StarVizion uses the theme's default for that element. Use a role for its meaning:
+`warning` for low fuel, not because you want orange.
+
+The roles are **proposed**:
+
+| Role | For |
+|---|---|
+| `primary` | normal content; the default |
+| `accent` | the thing to look at first |
+| `muted` | secondary detail and labels |
+| `ok` | a good or ready state |
+| `warning` | needs attention soon |
+| `danger` | needs attention now |
+
+```wit
+enum color-role { primary, accent, muted, ok, warning, danger }
+```
+
+**Open:** whether StarVizion tints `image` elements with the theme (monochrome images drawn in a role's colour), or
+shows them as they are.
+
+A `color` *field* is different: it is data, such as a star's class colour, and a pilot chooses whether to bind it.
+Plugins may offer colour fields.
+
 ### Vizlet templates
 
 A plugin can ship Vizlet templates in `assets/`, in StarVizion's own Vizlet format, bound to its fields. They appear
 in the Vizlet palette; a pilot places one and edits it like any other Vizlet. **(Settled, D8; the file layout is
-proposed.)**
+proposed.)** A template's colours are theme roles, never literal colours **(Settled, D11)**, so it matches the rest of
+the pilot's cockpit as soon as it is placed.
 
 The Vizlet file format is not settled before 1.0 (D9), so a template may need rebuilding against a newer StarVizion
 until then.
@@ -347,7 +379,97 @@ testable without the game running. Templates should come with a place for it.
 
 ---
 
-## Distribution and trust
+## Security
+
+A plugin is untrusted code from a stranger. StarVizion has to assume that some plugin, some day, is written to do
+harm, and keep the pilot safe anyway.
+
+### What keeps a pilot safe
+
+The sandbox does, not reviewing or scanning plugins. **(Settled, D8)**
+
+- A plugin is a WebAssembly component. It has no system calls of its own. It can do only what StarVizion hands it.
+- It cannot start programs, load native code, write any file, see controller or keyboard input, open windows, touch
+  the GPU, or reach other processes. Ordinary malware behaviour (dropping files, persisting, spreading, encrypting
+  files, logging keys) cannot be expressed in a plugin.
+- It can read only the paths and reach only the local ports in its manifest that the pilot approved
+  ([Permissions](#permissions)).
+- A plugin that crashes or hangs stops on its own, and everything it sends is validated
+  ([When a plugin misbehaves](#when-a-plugin-misbehaves)).
+
+The rules below close the gaps that remain inside that sandbox. They are **proposed** unless marked otherwise.
+
+### Read access
+
+Read-only access is still access. A plugin granted `{home}` could read SSH keys, browser profiles and saved
+passwords.
+
+- StarVizion refuses a manifest that asks for a drive root, the home directory itself, or a known-sensitive
+  location (`.ssh`, browser profile folders, the OS credential stores, StarVizion's own settings).
+- The permission prompt shows the resolved path itself, prominently. The plugin's `reason` is shown beside it, but
+  it is the author's text and may lie.
+- A link inside a granted folder cannot lead outside it. wasmtime's directory access is meant to guarantee this.
+  StarVizion tests it on Windows (junctions, shortcuts) and Linux (symlinks) rather than assume it.
+
+### Local ports
+
+"Local only" is not the same as harmless. A local port can belong to OBS's WebSocket (which controls OBS), another
+tool's API, or a proxy that relays to the internet. A plugin with file access and such a port could send what it
+reads somewhere else.
+
+- The prompt names what is listening on the port when StarVizion can tell, and warns when a plugin asks for both
+  file access and a port.
+- `localhost` means the pilot's own machine. Other machines on the LAN are a separate permission, if they are
+  allowed at all (**open**).
+
+**Open:** internet access. As proposed, no plugin gets it. If it is ever allowed, it must not be combined with file
+access in the same plugin, because that pairing is what turns a plugin into a way to steal files.
+
+### Resource limits
+
+A plugin must not be able to slow the pilot's machine while they fly in VR.
+
+- CPU: each `poll` runs under a time budget (wasmtime epoch interruption) and is cut off when it overruns.
+- Memory: a hard cap per plugin (wasmtime `ResourceLimiter`). A plugin that hits it traps.
+- Output: caps on updates per second, card size and log volume, so a plugin cannot fill the disk through `log`.
+
+**Open:** the numbers (see [When a plugin misbehaves](#when-a-plugin-misbehaves)).
+
+### The `.svplugin` file
+
+The file itself is attacker input, before any of its code runs.
+
+- The zip is read without extracting paths as given: no `..`, no absolute paths, no links (zip slip).
+- Sizes are capped before decompressing, to stop zip bombs.
+- The manifest is parsed strictly. Unknown keys are refused, not ignored.
+- Images in `assets/` are decoded with memory-safe Rust decoders, with limits on dimensions and file size.
+
+### Identity and updates
+
+Today any plugin can claim `author = "Elite Intel"`, and anyone can ship a "new version" under another plugin's
+`id`.
+
+- A plugin is signed by its author's key. The pilot sees which key signed it, not only the author name.
+- An update is accepted as an update only when it has the same `id` **and** the same signing key as the version the
+  pilot approved. Otherwise it is a different plugin and is approved from scratch.
+- A new version that asks for more permissions asks the pilot again. **(Settled, D8)**
+
+Signing says who wrote a plugin. It does not say the plugin is safe; the sandbox does that.
+
+**Open:** what "passing our validation" means for a third-party plugin. The automatic checks on this page run on
+every plugin added. Whether there is also a curated list of known plugins, or human review before a plugin is
+listed, is not decided. Review cannot be relied on to catch a hostile plugin, so it would be in addition to the
+sandbox, never instead of it.
+
+### StarVizion's own side
+
+- **wasmtime** is the wall. A bug in it is the worst case: a plugin escaping the sandbox. StarVizion tracks
+  wasmtime's security releases and ships them promptly, which is one reason to have an update check.
+- **Host functions** (`log`, and any added later) are code StarVizion runs on a plugin's behalf. Each one validates
+  its arguments like any other plugin input.
+- **Card text** is drawn as text, never interpreted. A card cannot hold a link, a command or markup.
+
+### Distribution
 
 **(Proposed)**
 
@@ -355,7 +477,7 @@ testable without the game running. Templates should come with a place for it.
   StarVizion's UI.
 - The sandbox and the permission prompt are what keep a pilot safe, not where the file came from.
 
-**Open:** signing, a curated list of known plugins, and automatic update checks.
+**Open:** a curated list of known plugins, and automatic update checks.
 
 ---
 
@@ -383,7 +505,8 @@ will carry the real slices.
 - Two plugins reporting a mode at once.
 - Field id namespacing: does StarVizion prefix field ids with the plugin id, so two plugins can both offer `fuel`?
 - Per-plugin settings a pilot can change (an IP address, a units choice), and how the UI shows them.
-- Internet access, signing, and update checks.
+- Internet access, LAN access, the signing scheme, what "passing our validation" means, and update checks
+  ([Security](#security)).
 - Which non-Rust languages get documentation and templates.
 - Whether feeding applications over a local socket become a supported tier (D8).
 - How a plugin's Vizlet templates relate to [CortexUnit](roadmap.md#cortexunit-reusableshareable-vizlet-templates),
@@ -396,3 +519,6 @@ will carry the real slices.
 | Date | Change |
 |---|---|
 | 2026-11-25 | First cut, from D3, D7, D8 and the design docs. |
+| 2026-11-26 | Cards and Vizlet templates use theme colour roles, not literal colours (D11). |
+| 2026-11-26 | Added the Security section; Distribution and trust moved under it. |
+| 2026-11-26 | Bundled plugins are `.svplugin` files in the same sandbox; hardware visualization is not a plugin (D12). |

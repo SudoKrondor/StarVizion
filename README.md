@@ -30,8 +30,9 @@ asks to access. Its Vizlets then appear in the palette, ready to place on the ca
 data and cards, and StarVizion draws them on the desktop and in VR. See
 [D8](docs/DECISIONS.md#d8-third-party-plugins-are-webassembly-components-starvizion-renders-their-cards).
 
-**Elite Intel** integration is a first-party plugin, written in Rust and built into StarVizion, for Elite Intel 2.0. It stays
-idle until Elite Intel is running. Neither app needs the other: some pilots will run only one of them.
+**Elite Intel** integration is a first-party plugin for Elite Intel 2.0, built as a `.svplugin` in the same sandbox
+as any third-party plugin and shipped with StarVizion already installed. It stays idle until Elite Intel is running
+([D12](docs/DECISIONS.md#d12-our-game-data-overlays-are-plugins-hardware-visualization-is-built-in)). Neither app needs the other: some pilots will run only one of them.
 
 ## Layout
 

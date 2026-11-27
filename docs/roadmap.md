@@ -6,7 +6,7 @@
 
 **Richer Elite Dangerous Data** — anything beyond what the bundled Elite Intel plugin offers (for example Frontier's Commander API data: market prices, fleet carrier status, stored loadouts) belongs in a provider, not in StarVizion. StarVizion never reads game files itself.
 
-**Theme and Skin System** — a global colour theme system for Vizlets, with preset palettes applying consistently across all nodes, making it easy to rebrand an entire cockpit layout without editing each node individually.
+**Theme and Skin System** — a global colour theme system for Vizlets, with preset palettes applying consistently across all nodes, making it easy to rebrand an entire cockpit layout without editing each node individually. Pilots use it to match their Vizlets to the game's HUD or to an OBS scene. Already settled ([D11](DECISIONS.md#d11-starvizion-owns-colour-plugins-name-colour-roles)): plugins name colour roles and never choose colours, so plugin cards and templates follow the theme. Still to design: the full set of roles, the theme editor, per-HoloFrame theme overrides, how StarCalc refers to a role, and whether card images are tinted.
 
 **Controller Map Integration** — when BindForge's own (also-roadmap) Controller Map mode is implemented, StarVizion could serve as the rendering engine for an interactive 3D controller model, sharing the input capture subsystem.
 

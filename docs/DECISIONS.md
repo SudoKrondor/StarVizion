@@ -94,7 +94,7 @@ Vizlet. The plugin sends data and declarative cards (text, gauges, lists, images
 so no plugin touches the GPU or the render thread.
 
 Plugins StarVizion bundles and whose other side we own, such as Elite Intel (D4), are first-party Rust built into
-StarVizion. They connect to their application themselves. Running applications that feed StarVizion directly over a
+StarVizion *(superseded by D12: bundled plugins are `.svplugin` files too)*. They connect to their application themselves. Running applications that feed StarVizion directly over a
 local socket, using the same field and card model, may become a second tier later. That is not decided yet.
 
 **Why:**
@@ -119,7 +119,7 @@ mechanism backed.
 
 *Krondor, 2026-11-24.*
 
-Until StarVizion 1.0 is released, everything is in-house. The StarCalc language, the Vizlet and HoloFrame file
+Until StarVizion 1.0 (the first public release) ships, everything is in-house. The StarCalc language, the Vizlet and HoloFrame file
 formats and other user-facing formats may change without migrations or backward compatibility. From 1.0 on, the
 compatibility rules in `docs/CODING_STANDARD.md` (API & Compatibility) apply in full. `starvizion-provider-api`
 keeps the rule in `CLAUDE.md`.
@@ -136,3 +136,47 @@ locale.
 
 **Why:** Rust's standard library cannot format by locale, and doing it properly needs large dependencies (ICU4X).
 Nothing compelling justifies that cost before the product exists.
+
+## D11. StarVizion owns colour; plugins name colour roles
+
+*Krondor, 2026-11-26.*
+
+Every colour a plugin's content shows comes from the pilot's theme. A plugin never chooses colours. A card names a
+colour role (such as `primary`, `accent`, `warning`, `danger` or `muted`), and StarVizion fills it in from the active
+theme. The card contract has no way to send a literal colour. The Vizlet templates a plugin ships use theme roles for
+their colours. They contain no colour literals.
+
+A pilot's own Vizlets can still use literal colours, because the pilot is choosing them. A plugin may still offer
+`color` fields, such as a star's class colour or the game's HUD colours. These are data, and a pilot decides whether
+to bind them.
+
+**Why:** a pilot runs Vizlets from several plugins at once, next to their own. They should look like one cockpit,
+matched to the game's HUD or to an OBS scene, whoever wrote the plugin. `starvizion-provider-api` is public and can
+only change compatibly. Literal colours in cards would have to be supported for good once third-party plugins ship,
+so the contract has to leave them out from the start.
+
+**Still open:** the full set of roles, how a pilot edits a theme, theme overrides per HoloFrame, how StarCalc
+refers to a role, and whether card images are tinted by the theme (see
+[Roadmap — Theme and Skin System](roadmap.md#post-first-release-roadmap)).
+
+## D12. Our game-data overlays are plugins; hardware visualization is built in
+
+*Krondor, 2026-11-26.*
+
+StarVizion has two kinds of Vizlet content:
+
+- **Hardware visualization** is part of StarVizion. It shows the pilot's controllers from StarVizion's own input
+  capture, works with no plugin installed (D3), and is optional: the pilot configures it and shows or hides it like
+  any other Vizlet. The plugin architecture does not handle it, and no plugin ever sees controller input.
+- **Data-driven overlays** come from plugins. Our own, the Elite Intel overlay cards and FrameShift's cards, are
+  `.svplugin` WebAssembly components built against the same `starvizion-provider-api` and run in the same sandbox
+  as any third-party plugin. They differ only in shipping with StarVizion, already installed and approved, so the
+  Elite Intel integration still needs no setup (D4).
+
+**Why:** our plugins are the first users of the plugin API and the sandbox, and we can change all three sides
+freely before the first public release. Building them the way a third party would finds the gaps in the contract,
+the permissions and the tooling before outside developers depend on them. It also leaves one plugin model to
+build, test and secure instead of two.
+
+**What it supersedes in D8:** bundled plugins as native Rust built into StarVizion. Bundled plugins are now
+`.svplugin` files that ship with StarVizion.
