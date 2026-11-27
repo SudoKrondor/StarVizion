@@ -342,13 +342,13 @@ Paths can use placeholders (`{home}`, `{documents}`, and the like) so one manife
 |---|---|---|
 | Rust | `cargo` with the `wasm32-wasip2` target, `wit-bindgen` | First-class. Smallest plugins, best tooling. |
 | JavaScript / TypeScript | `jco` / `componentize-js` | Bundles a JS engine; larger files. |
-| Python | `componentize-py` | Bundles an interpreter (tens of MB). Most packages with C extensions will not work. |
+| Python | `componentize-py` | **Not supported** ([D15](DECISIONS.md#d15-rust-is-the-plugin-language-python-is-not-supported-in-the-first-release)): bundles an interpreter (tens of MB), and most packages with C extensions will not work. |
 | Go | TinyGo with WASI Preview 2 | |
 | C / C++ | `wit-bindgen` C bindings, `wasi-sdk` | |
 | C# | `componentize-dotnet` | |
 
-Only Rust and Python are in the spike; the rest are listed because they build components today, not because they
-are tested. Which of them StarVizion documents and ships templates for is **open**.
+Rust is the supported language (D15) and the only one in the spike. The others are listed because they build
+components today, not because they are tested. StarVizion documents and ships templates for Rust only (D15).
 
 ---
 
@@ -486,7 +486,7 @@ sandbox, never instead of it.
 The order the plugin work is likely to go in. The build-plan brief (`docs/build-plan/plugins.md`, not written yet)
 will carry the real slices.
 
-1. **D8 spike.** One Rust plugin and one Python plugin, each reading a file and talking to a local port, loaded by a
+1. **D8 spike.** One Rust plugin reading a file and talking to a local port, loaded by a
    bare `wasmtime` host. Proves WASI file and socket access and measures plugin size and start-up time.
    ([D8 risks](DECISIONS.md#d8-third-party-plugins-are-webassembly-components-starvizion-renders-their-cards))
 2. **The WIT contract.** Fields, modes, updates; then cards. Lives in `crates/provider-api`.
@@ -507,7 +507,6 @@ will carry the real slices.
 - Per-plugin settings a pilot can change (an IP address, a units choice), and how the UI shows them.
 - Internet access, LAN access, the signing scheme, what "passing our validation" means, and update checks
   ([Security](#security)).
-- Which non-Rust languages get documentation and templates.
 - Whether feeding applications over a local socket become a supported tier (D8).
 - How a plugin's Vizlet templates relate to [CortexUnit](roadmap.md#cortexunit-reusableshareable-vizlet-templates),
   if CortexUnit is ever designed.
@@ -522,3 +521,4 @@ will carry the real slices.
 | 2026-11-26 | Cards and Vizlet templates use theme colour roles, not literal colours (D11). |
 | 2026-11-26 | Added the Security section; Distribution and trust moved under it. |
 | 2026-11-26 | Bundled plugins are `.svplugin` files in the same sandbox; hardware visualization is not a plugin (D12). |
+| 2026-11-26 | Rust is the supported plugin language; Python is not supported, and the spike is Rust only (D15). |

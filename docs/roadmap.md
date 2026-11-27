@@ -8,6 +8,8 @@
 
 **Theme and Skin System** — a global colour theme system for Vizlets, with preset palettes applying consistently across all nodes, making it easy to rebrand an entire cockpit layout without editing each node individually. Pilots use it to match their Vizlets to the game's HUD or to an OBS scene. Already settled ([D11](DECISIONS.md#d11-starvizion-owns-colour-plugins-name-colour-roles)): plugins name colour roles and never choose colours, so plugin cards and templates follow the theme. Still to design: the full set of roles, the theme editor, per-HoloFrame theme overrides, how StarCalc refers to a role, and whether card images are tinted.
 
+**Moving VR Overlays with Motion Controllers** — for pilots who keep their VR controllers charged: grab an overlay in the headset in a layout mode, with actions bound through SteamVR Input. See [VR Overlay — Positioning](vr-overlay.md#vr-overlay-positioning-and-persistence).
+
 **Controller Map Integration** — when BindForge's own (also-roadmap) Controller Map mode is implemented, StarVizion could serve as the rendering engine for an interactive 3D controller model, sharing the input capture subsystem.
 
 **Vizlet-Wide Shared Locals** — see [below](#vizlet-wide-shared-locals).

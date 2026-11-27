@@ -111,6 +111,7 @@ local socket, using the same field and card model, may become a second tier late
 - WASI sockets and file access are newer parts of the standard. Prototype one Rust plugin and one Python plugin that
   read a game file and talk to a local port.
 - Python plugins bundle an interpreter (tens of MB), and most packages with C extensions will not work in them.
+  *(D15 drops Python and the Python half of the spike.)*
 
 **What it supersedes:** "any language" in `README.md`, which assumed an interface that no language-neutral
 mechanism backed.
@@ -180,3 +181,81 @@ build, test and secure instead of two.
 
 **What it supersedes in D8:** bundled plugins as native Rust built into StarVizion. Bundled plugins are now
 `.svplugin` files that ship with StarVizion.
+
+## D13. Raw, per-OS input backends behind one interface
+
+*Krondor, 2026-11-26.*
+
+StarVizion reads controllers through each OS's raw device interface: HID and DirectInput-class devices on Windows
+(with XInput for Xbox-style pads), evdev on Linux. Each backend sits behind one interface in `crates/input`, so
+nothing above the input layer knows which one is running (`docs/CODING_STANDARD.md`). Gamepad libraries that map
+every device onto an Xbox-pad layout (`gilrs`, SDL's game-controller API) are not the backend.
+
+**Why:** StarVizion's pilots fly HOTAS, throttles, pedals and button boxes with many more axes, buttons and hats than
+a gamepad has. A gamepad layout drops or renames them. Raw access also gives the port path that tells two identical
+sticks apart ([Multi-Device Identity](vizlet-and-node-system.md#multi-device-identity)).
+
+**Follows from it:** on Linux, reading `/dev/input` needs permission. The `.deb` and `.rpm` can ship a udev rule for
+game controllers (D6). Which crates each backend uses is settled in the Input brief.
+
+## D14. VR overlays go through OpenVR
+
+*Krondor, 2026-11-26.*
+
+StarVizion's VR modes submit overlays through OpenVR's overlay API (SteamVR on Windows and Linux). OpenXR is not
+used for overlays in the first release.
+
+**Why:** OpenVR has a mature overlay API that any application can use alongside a running game. OpenXR overlays
+need an extension that few runtimes implement. Desktop+ mode (`docs/vr-overlay.md`) stays as a convenience for
+pilots who already use it, not as the main way into VR.
+
+**Testing:** Krondor has no headset yet. Dawn tests VR on Windows until one is available for Linux.
+
+**Open:** pilots who run a game on a non-SteamVR runtime (the Meta/Oculus runtime directly, or Monado/WiVRn on Linux)
+will not see OpenVR overlays. How many of them there are, and whether that needs an answer, is not settled.
+
+## D15. Rust is the plugin language; Python is not supported in the first release
+
+*Krondor, 2026-11-26.*
+
+Plugins are written in Rust. Rust is what StarVizion documents, templates and tests. Python is not supported. Other
+languages that build a WebAssembly component (JavaScript, Go, C/C++, C#) may work against the same WIT contract,
+but StarVizion does not document or test them in the first release.
+
+**Why:** a Python plugin bundles an interpreter (tens of MB per plugin), starts slowly, uses much more memory, and
+cannot use most packages with C extensions, which removes much of the reason to write it in Python. A slow plugin
+cannot lower the frame rate: plugins run off the render thread under a time budget (D8). The cost is the pilot's
+disk, memory and start-up time, and the support burden of a second toolchain.
+
+**What it supersedes in D8:** Python as a supported plugin language, and the Python plugin in the D8 spike. The
+spike proves WASI file and socket access with a Rust plugin only.
+
+## D16. Linux desktop overlays target Wayland on KDE Plasma; GNOME is best effort
+
+*Krondor, 2026-11-26.*
+
+On Linux, the desktop overlay targets Wayland first, through the layer-shell protocol, tested on KDE Plasma. wlroots
+compositors (Sway, Hyprland) support the same protocol. GNOME has no layer-shell, so it gets best-effort support,
+most likely through XWayland, and StarVizion's site says plainly that KDE works better for gaming. X11 sessions are
+not a target of their own.
+
+**Why:** gaming distributions (Bazzite, Nobara, SteamOS desktop, CachyOS) mostly ship KDE Plasma. Some Elite Intel
+users run GNOME, so it should work where it can, but it must not hold back the main path. Overlays draw over games
+in borderless windowed mode, not exclusive fullscreen, on every OS. Pilots already expect that.
+
+## D17. A Stream Canvas for OBS, separate from what the pilot sees
+
+*Krondor, 2026-11-26.*
+
+StarVizion has a Stream Canvas: an ordinary window, at a resolution the pilot picks to match their OBS canvas, with
+an opaque background (black by default) that streamers key out in OBS. Each Vizlet can be shown on it, at a position
+there that is separate from its desktop and VR placement. Details are in
+[VR Overlay — Stream Canvas](vr-overlay.md#stream-canvas).
+
+**Why:** OBS cannot capture a click-through overlay window as a source (Elite Intel's native overlay has the same
+problem), so today streamers can only capture the whole desktop. Streamers arrange their scenes differently from how
+pilots arrange their cockpit, at 1920×1080, 3440×1440 or 4K. VR streams follow the pilot's head, so Vizlets in the
+VR view come and go. A fixed canvas gives streamers one source to place, keyed the way they already key other
+sources. Black is the usual key colour because green leaves a fringe around text.
+
+**Not supported:** 180° and 360° VR video. Few viewers can watch it.

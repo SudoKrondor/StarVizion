@@ -48,7 +48,8 @@ Everything about the Vizlet itself, as a whole — not about any one NeuroNode w
 
 - **Identity** — name, tags (both editable); author, created timestamp, version (read-only, system-set).
 - **Window** — width, height, position (left/top); always-on-top, transparent, and locked toggles (locked here is the same state as the live Vizlet's own [right-click context menu](#live-vizlet-context-menu) Lock/Unlock — just a second place to reach it).
-- **Render Mode** — Desktop or VR, per [VR Overlay](vr-overlay.md). When VR is selected: world-locked vs. HMD-locked, and the current VR transform (position X/Y/Z in meters, width in meters) shown read-only — that transform is set by grabbing and moving the overlay in the headset, the same way any VR overlay is repositioned, not by typing coordinates here.
+- **Render Mode** — Desktop or VR, per [VR Overlay](vr-overlay.md). When VR is selected: world-locked vs. HMD-locked, and the current VR transform (position X/Y/Z in meters, width in meters) shown read-only. The pilot sets it in the [VR layout view](vr-overlay.md#vr-overlay-positioning-and-persistence) by dragging with the mouse and using the wheel for distance, not by typing coordinates here (settled 2026-11-26).
+- **Show on Stream Canvas** — a switch, independent of Render Mode, with the Vizlet's position and size on the [Stream Canvas](vr-overlay.md#stream-canvas) (settled 2026-11-26, D17). The pilot arranges Vizlets on it in a Stream Canvas layout view, by drag and drop at the canvas's aspect ratio.
 - **Mode-Based Visibility** — the always-visible / visible-in / hidden-in setting and mode selection described below. Lives here, not on the NeuroNodes tab, since it is a Vizlet-level setting, not a per-NeuroNode one.
 
 ### NeuroNodes Tab

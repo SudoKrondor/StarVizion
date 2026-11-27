@@ -24,7 +24,7 @@ one against [`starvizion-provider-api`](crates/provider-api), to bring data from
 into StarVizion.
 
 A third-party plugin is a single `.svplugin` file: a WebAssembly component plus a manifest. Write it
-in Rust, or in any language that builds a WebAssembly component (JavaScript, Python, Go, C/C++, C#).
+in Rust ([D15](docs/DECISIONS.md#d15-rust-is-the-plugin-language-python-is-not-supported-in-the-first-release)).
 The same file runs on Windows and Linux. Users add it from the StarVizion UI and approve what it
 asks to access. Its Vizlets then appear in the palette, ready to place on the canvas. Plugins send
 data and cards, and StarVizion draws them on the desktop and in VR. See
