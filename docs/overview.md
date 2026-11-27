@@ -13,7 +13,7 @@ StarVizion is its own application, not a feature of another one. It needs no oth
 
 ## What StarVizion Does
 
-StarVizion creates **Vizlets**: frameless, borderless, transparent, always-on-top windows that float above the desktop and the game, or — for VR players — overlays rendered directly into the VR compositor. Each Vizlet is a visual composition that can show:
+StarVizion creates **Vizlets**: frameless, borderless, transparent, always-on-top windows that float above the desktop and the game, or capture windows that VR players bring into the headset with Desktop+ and streamers capture in OBS. Each Vizlet is a visual composition that can show:
 
 - Live axis positions (joystick, throttle, rudder, sliders, rotaries)
 - Button press/release states, including multi-stage triggers and 3-position switches
@@ -41,7 +41,7 @@ StarVizion is not tied to any one game. Controller visualization is game-agnosti
 - [StarCalc Expression Engine](starcalc-expression-engine.md) — the expression language that drives Live and Static behaviour
 - [HoloFrames and Persistence](holoframes-and-persistence.md) — saving, grouping, exporting, and importing Vizlets
 - [UI Layout](ui-layout.md) — the editor UI and mode-based visibility system
-- [VR Overlay](vr-overlay.md) — desktop vs. VR rendering
+- [Vizlet Windows, VR and Streaming](vr-overlay.md) — overlays, capture windows, Desktop+ and OBS
 - [Roadmap](roadmap.md) — features beyond the first release, and open questions
 - [Plugin Development](plugin-development.md) — what writing a plugin looks like for a third-party developer (first cut, changing with the R&D)
 - [Decisions](DECISIONS.md) — why StarVizion is a standalone Rust application, and the other architectural decisions

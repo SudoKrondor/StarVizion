@@ -13,6 +13,5 @@ starvizion-model.workspace = true
 starvizion-starcalc.workspace = true
 starvizion-input.workspace = true
 starvizion-render.workspace = true
-starvizion-vr.workspace = true
 starvizion-provider-api.workspace = true
 starvizion-plugin-elite-intel.workspace = true

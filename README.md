@@ -43,7 +43,6 @@ as any third-party plugin and shipped with StarVizion already installed. It stay
 | `crates/starcalc` | The StarCalc expression language |
 | `crates/input` | Controllers, mouse, and opt-in keyboard capture |
 | `crates/render` | Composes a frame and presents it on the desktop |
-| `crates/vr` | VR compositor overlays |
 | `crates/provider-api` | The public API for providers and plugins |
 | `plugins/elite-intel` | The bundled Elite Intel plugin |
 

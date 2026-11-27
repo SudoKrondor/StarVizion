@@ -200,7 +200,7 @@ game controllers (D6). Which crates each backend uses is settled in the Input br
 
 ## D14. VR overlays go through OpenVR
 
-*Krondor, 2026-11-26.*
+*Krondor, 2026-11-26. Superseded by D18.*
 
 StarVizion's VR modes submit overlays through OpenVR's overlay API (SteamVR on Windows and Linux). OpenXR is not
 used for overlays in the first release.
@@ -245,7 +245,7 @@ in borderless windowed mode, not exclusive fullscreen, on every OS. Pilots alrea
 
 ## D17. A Stream Canvas for OBS, separate from what the pilot sees
 
-*Krondor, 2026-11-26.*
+*Krondor, 2026-11-26. Superseded by D18.*
 
 StarVizion has a Stream Canvas: an ordinary window, at a resolution the pilot picks to match their OBS canvas, with
 an opaque background (black by default) that streamers key out in OBS. Each Vizlet can be shown on it, at a position
@@ -259,3 +259,32 @@ VR view come and go. A fixed canvas gives streamers one source to place, keyed t
 sources. Black is the usual key colour because green leaves a fringe around text.
 
 **Not supported:** 180° and 360° VR video. Few viewers can watch it.
+
+## D18. Vizlets are windows: an overlay for the desktop, a capture window for VR and OBS
+
+*Krondor and Alan, 2026-11-27.*
+
+StarVizion has no VR code of its own. Every Vizlet is drawn into ordinary desktop windows of two kinds, and a pilot
+can show a Vizlet as either or both:
+
+- **Overlay:** transparent, frameless, click-through and always on top, placed anywhere on the desktop. For pilots
+  playing on a monitor.
+- **Capture window:** a frameless window that other software captures. Its background is transparent, or a solid
+  colour (black by default) for keying in OBS. For VR, Desktop+ captures it and places it in the headset, keeping
+  its transparency. For streaming, OBS captures it as a source of its own.
+
+VR on Linux waits until Krondor has a headset to try what works. It may be StarVizion's own solution or a
+third-party tool StarVizion points pilots to.
+
+**Why:** Desktop+ already does what the VR design was going to build: it is free, open source, places captured
+windows in VR and lets the pilot position them there. Alan's Python prototype shows that Vizlet windows captured by
+Desktop+ keep their transparency. OBS captures ordinary windows the same way, so each Vizlet is its own OBS source
+and no separate stream canvas is needed. Click-through overlays cannot be captured as windows (Elite Intel's native
+overlay has the same limit), which is why a capture window is a separate kind.
+
+**What it supersedes:** D14 (OpenVR overlays), D17 (the Stream Canvas), the VR layout view, moving overlays with
+VR controllers, and the four render modes (Desktop, VR, Desktop + VR, Desktop+). The `crates/vr` stub is removed.
+
+**Reference:** Alan's Python prototype also has much of the Vizlet management UI worked out. When he shares it, it
+is a source of ideas to cherry-pick, not code to port: it is slow and drifts out of sync, which is what Rust is for
+(D2).

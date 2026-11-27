@@ -20,11 +20,11 @@ A HoloFrame can optionally be assigned to one or more game modes, using the same
 
 A HoloFrame with no mode assignment behaves exactly as it always has — manual activate/deactivate only, no automatic switching.
 
-### Render Mode Override
+### Window Kind Override
 
-A HoloFrame can optionally set a [Render Mode](vr-overlay.md#rendering-modes) (Desktop, VR, Desktop + VR, or Desktop+) that applies to every member Vizlet uniformly — the same precedence pattern as Mode-Based HoloFrame Switching above: while a Vizlet belongs to a HoloFrame with a Render Mode override set, that override governs how the Vizlet renders, and its own individually-configured Render Mode is not consulted. A HoloFrame with no Render Mode override leaves each member's own individual setting untouched.
+A HoloFrame can optionally set which [kinds of window](vr-overlay.md#two-kinds-of-vizlet-window) its members show as — overlay, capture window, or both — for every member Vizlet uniformly (D18, 2026-11-27). This follows the same precedence pattern as Mode-Based HoloFrame Switching above: while a Vizlet belongs to a HoloFrame with a window kind override set, that override governs which windows the Vizlet shows, and its own individual setting is not consulted. A HoloFrame with no override leaves each member's own setting untouched. A typical use: one HoloFrame of capture windows for a VR session through Desktop+, another of overlays for flying on a monitor.
 
-This is deliberately whole-group, not per-member — a HoloFrame is the grouping of Vizlets, so its settings apply to the group as a set. A player who wants some Vizlets in what they think of as one set to render differently than others splits that into two HoloFrames rather than expecting mixed behaviour inside one; the same answer already applies to visibility, and there's no reason Render Mode should work differently.
+This is deliberately whole-group, not per-member — a HoloFrame is the grouping of Vizlets, so its settings apply to the group as a set. A player who wants some Vizlets in what they think of as one set to show differently than others splits that into two HoloFrames rather than expecting mixed behaviour inside one; the same answer already applies to visibility.
 
 **Deleting a HoloFrame:** removes the grouping only, with confirmation. Since a HoloFrame never owns Vizlet content — it only references Vizlet IDs — deleting one never deletes the member Vizlets themselves; they remain in the Vizlet library, untouched, just no longer grouped under the deleted HoloFrame.
 

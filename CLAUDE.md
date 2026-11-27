@@ -7,7 +7,7 @@ Guidance for Claude Code working in this repository.
 StarVizion: live controller-input and game-data overlays, on the desktop and in VR. A Rust cargo workspace,
 Windows and Linux. Read `README.md` for the layout and `docs/DECISIONS.md` for why it is shaped this way.
 
-The product design (Vizlets, NeuroNodes, StarCalc, HoloFrames, render modes) lives in `docs/`, starting at
+The product design (Vizlets, NeuroNodes, StarCalc, HoloFrames, Vizlet windows) lives in `docs/`, starting at
 `docs/overview.md`. StarVizion is a standalone application, not an Elite Intel feature and not specific to any game.
 If a design doc still assumes Elite Intel as the host, `docs/DECISIONS.md` wins.
 

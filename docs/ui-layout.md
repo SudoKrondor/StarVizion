@@ -1,6 +1,6 @@
 # StarVizion — UI Layout
 
-StarVizion's main window holds its editor and management UI. All Vizlet windows themselves float outside the main window, directly on the desktop (or in VR).
+StarVizion's main window holds its editor and management UI. All Vizlet windows themselves float outside the main window, directly on the desktop, as overlays or as capture windows that Desktop+ brings into VR and OBS captures ([Vizlet Windows](vr-overlay.md)).
 
 ## Left Navigation (Within the Main Window)
 
@@ -19,7 +19,7 @@ Shows all saved Vizlets as cards. Each card shows the Vizlet's name, tags, a thu
 
 ## HoloFrame Library View
 
-Shown merged with the Vizlet Library in a single two-column screen — Vizlets on the left, HoloFrames on the right — rather than as separate tabs. HoloFrames are shown as cards in the same poster-grid style as Vizlets, not a list — each card's "thumbnail" area shows a live member count (e.g. "3 Vizlets") in place of a rendered preview, since a HoloFrame has no visual content of its own to preview. Below that: the HoloFrame's editable name, its member Vizlets as individual removable chips, and (when set) small badges summarizing its mode assignment and Render Mode override. **Membership is set by drag-and-drop:** dragging a Vizlet card from the left column onto a HoloFrame card on the right adds it as a member (the member count updates immediately); dropping a Vizlet already in that HoloFrame is a no-op. A member is removed via the &times; on its chip, from either the library card or the HoloFrame Editor described below. This part is built in the mockup.
+Shown merged with the Vizlet Library in a single two-column screen — Vizlets on the left, HoloFrames on the right — rather than as separate tabs. HoloFrames are shown as cards in the same poster-grid style as Vizlets, not a list — each card's "thumbnail" area shows a live member count (e.g. "3 Vizlets") in place of a rendered preview, since a HoloFrame has no visual content of its own to preview. Below that: the HoloFrame's editable name, its member Vizlets as individual removable chips, and (when set) small badges summarizing its mode assignment and window kind override. **Membership is set by drag-and-drop:** dragging a Vizlet card from the left column onto a HoloFrame card on the right adds it as a member (the member count updates immediately); dropping a Vizlet already in that HoloFrame is a no-op. A member is removed via the &times; on its chip, from either the library card or the HoloFrame Editor described below. This part is built in the mockup.
 
 Each card has the same three corner icon-button controls as a Vizlet card (play/edit/dots-menu — see [Vizlet Library View](#vizlet-library-view)), overlaid on the thumbnail area exactly the same way. The play icon here activates/deactivates the whole HoloFrame (all members shown/hidden together, per [HoloFrames](holoframes-and-persistence.md#holoframes)); an active HoloFrame's card is highlighted (full card, not just the button, since unlike a Vizlet a HoloFrame has no separate status indicator to carry that state).
 
@@ -30,9 +30,9 @@ Reached the same way a Vizlet's editor is: the card's pencil icon, or Edit from 
 - **Identity** — ID (read-only, system-set), Name (editable; syncs back to the library card's name on close).
 - **Members** — the same removable chips shown on the library card, plus a note pointing back to the library screen for adding members via drag-and-drop.
 - **Mode-Based Switching** — a Manual-only/Assigned-to-mode(s) selector; when Assigned, checkboxes for the same mode list used by [per-Vizlet Mode-Based Visibility](#mode-based-visibility), per [Mode-Based HoloFrame Switching](holoframes-and-persistence.md#mode-based-holoframe-switching).
-- **Render Mode Override** — a single selector (None / Desktop / VR / Desktop + VR / Desktop+), per [Render Mode Override](holoframes-and-persistence.md#render-mode-override). Whole-group only, matching the doc — there is no per-member override control anywhere in this editor.
+- **Window Kind Override** — a single selector (None / Overlay / Capture window / Both), per [Window Kind Override](holoframes-and-persistence.md#window-kind-override). Whole-group only, matching the doc — there is no per-member override control anywhere in this editor.
 
-Changes to mode assignment and Render Mode override are held in the editor until BACK TO LIBRARY is clicked, at which point they're written back to the HoloFrame and reflected in its library-row badges. This mirrors the mockup's convention elsewhere of writing changes back on navigation rather than a live per-keystroke sync, since neither setting has a meaningful "live preview" the way a Vizlet's own properties do.
+Changes to mode assignment and window kind override are held in the editor until BACK TO LIBRARY is clicked, at which point they're written back to the HoloFrame and reflected in its library-row badges. This mirrors the mockup's convention elsewhere of writing changes back on navigation rather than a live per-keystroke sync, since neither setting has a meaningful "live preview" the way a Vizlet's own properties do.
 
 ## Vizlet Editor
 
@@ -48,8 +48,7 @@ Everything about the Vizlet itself, as a whole — not about any one NeuroNode w
 
 - **Identity** — name, tags (both editable); author, created timestamp, version (read-only, system-set).
 - **Window** — width, height, position (left/top); always-on-top, transparent, and locked toggles (locked here is the same state as the live Vizlet's own [right-click context menu](#live-vizlet-context-menu) Lock/Unlock — just a second place to reach it).
-- **Render Mode** — Desktop or VR, per [VR Overlay](vr-overlay.md). When VR is selected: world-locked vs. HMD-locked, and the current VR transform (position X/Y/Z in meters, width in meters) shown read-only. The pilot sets it in the [VR layout view](vr-overlay.md#vr-overlay-positioning-and-persistence) by dragging with the mouse and using the wheel for distance, not by typing coordinates here (settled 2026-11-26).
-- **Show on Stream Canvas** — a switch, independent of Render Mode, with the Vizlet's position and size on the [Stream Canvas](vr-overlay.md#stream-canvas) (settled 2026-11-26, D17). The pilot arranges Vizlets on it in a Stream Canvas layout view, by drag and drop at the canvas's aspect ratio.
+- **Windows** — two switches, **Overlay** and **Capture window**, either or both on, per [Vizlet Windows](vr-overlay.md#two-kinds-of-vizlet-window) (D18, 2026-11-27). With Capture window on: its background, transparent (for Desktop+) or a solid colour (for keying in OBS, black by default).
 - **Mode-Based Visibility** — the always-visible / visible-in / hidden-in setting and mode selection described below. Lives here, not on the NeuroNodes tab, since it is a Vizlet-level setting, not a per-NeuroNode one.
 
 ### NeuroNodes Tab
@@ -118,7 +117,7 @@ Mode transitions are debounced (a brief delay before changing visibility) to pre
 
 ### Hiding Never Closes a Window
 
-Whenever a Vizlet becomes hidden — from its own Mode-Based Visibility setting, or from a [HoloFrame](holoframes-and-persistence.md#mode-based-holoframe-switching) deactivating around it — its window stays open the whole time; only its visibility changes. It is never closed and later reopened as part of this. This matters specifically for Desktop + VR: destroying and recreating the VR overlay handle on every mode change would force it to reset its position/connection each time, which reads as visible flicker in the headset during ordinary play. This is distinct from the player explicitly right-clicking a Vizlet and choosing **Close** — that's a deliberate action that really does remove the window, unaffected by any of this.
+Whenever a Vizlet becomes hidden — from its own Mode-Based Visibility setting, or from a [HoloFrame](holoframes-and-persistence.md#mode-based-holoframe-switching) deactivating around it — its window stays open the whole time; only its visibility changes. It is never closed and later reopened as part of this. This matters specifically for capture windows: closing and reopening one on every mode change would make Desktop+ and OBS lose the window they are capturing, which reads as flicker in the headset or a gap on stream during ordinary play. This is distinct from the player explicitly right-clicking a Vizlet and choosing **Close** — that's a deliberate action that really does remove the window, unaffected by any of this.
 
 ### Manual Override
 

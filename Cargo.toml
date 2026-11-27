@@ -16,7 +16,6 @@ starvizion-model = { path = "crates/model" }
 starvizion-starcalc = { path = "crates/starcalc" }
 starvizion-input = { path = "crates/input" }
 starvizion-render = { path = "crates/render" }
-starvizion-vr = { path = "crates/vr" }
 starvizion-provider-api = { path = "crates/provider-api" }
 starvizion-plugin-elite-intel = { path = "plugins/elite-intel" }
 

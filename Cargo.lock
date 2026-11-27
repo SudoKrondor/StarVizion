@@ -12,7 +12,6 @@ dependencies = [
  "starvizion-provider-api",
  "starvizion-render",
  "starvizion-starcalc",
- "starvizion-vr",
 ]
 
 [[package]]
@@ -40,8 +39,4 @@ version = "0.1.0"
 
 [[package]]
 name = "starvizion-starcalc"
-version = "0.1.0"
-
-[[package]]
-name = "starvizion-vr"
 version = "0.1.0"

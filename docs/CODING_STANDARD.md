@@ -21,7 +21,7 @@ no sandboxed packaging) and the decisions in `docs/DECISIONS.md` take precedence
   of this: `model` knows nothing about rendering, devices or VR; `render` evaluates nothing itself; `starcalc`
   knows nothing about windows. A change that makes one crate reach into another's concern is a design change.
 - Favour extension without modification (Open/Closed) where it does not add speculative abstraction.
-- Depend on traits at crate seams where there is more than one implementation (per platform, per VR runtime, real
+- Depend on traits at crate seams where there is more than one implementation (per platform, real
   versus test). Do not introduce a trait for a single implementation "for testability" when a plain function or
   struct can be tested directly.
 - Implementations of a trait must honour its documented contract (Liskov). A trait's doc comment states that
@@ -39,7 +39,7 @@ DO NOT:
 - Introduce hidden dependencies, implicit behaviour, or implicit ordering between components (global mutable state,
   initialisation that must happen "first" without the type system enforcing it).
 - Leak implementation details of a library or platform through a public interface. Callers must not need to know
-  whether input came from evdev, XInput or SDL, or whether frames go to OpenVR or OpenXR. Do not expose a
+  whether input came from evdev, XInput or SDL, or whether a window is a Win32 window or a Wayland surface. Do not expose a
   dependency's types in a crate's public API unless that is a deliberate, documented choice.
 - Handle the same concept (value type, missing-value representation, units, naming) differently across code
   paths. New code matches how the rest of the system already handles it.
@@ -57,7 +57,7 @@ unexpected states**. The two are not in tension when applied deliberately.
   error with a clear, actionable message, or panic if it can only be a bug in our own code. Do not limp along with a
   guessed default.
 - **Graceful degradation is allowed only as a deliberate product decision, and must be documented with a
-  `// WHY:` comment.** Expected examples: StarVizion runs without a VR runtime and shows desktop overlays only; a
+  `// WHY:` comment.** Expected examples: GNOME has no layer-shell, so overlays fall back to best-effort support there (D16); a
   controller unplugged mid-session shows as disconnected rather than stopping the app; a provider that disappears
   leaves its bound fields empty; a Vizlet's missing font falls back to the bundled font. These are features, not
   masked bugs.
@@ -204,7 +204,7 @@ fn handle(item: &Item, store: &mut Store) {
 
 ## Unsafe Code
 
-StarVizion talks to Win32, X11/Wayland, evdev and VR runtimes, so some `unsafe` is unavoidable. Keep it small and
+StarVizion talks to Win32, Wayland, X11 and evdev, so some `unsafe` is unavoidable. Keep it small and
 auditable.
 
 - No `unsafe` outside the modules that wrap FFI or platform APIs. Shared logic and the domain crates (`model`,
@@ -216,8 +216,8 @@ auditable.
 
 ## Concurrency and the Render Loop
 
-The render loop runs at the headset's refresh rate (90-144 Hz) and VR submission happens every frame. A missed
-frame is visible to the pilot.
+The render loop runs at the display's refresh rate (60-144 Hz), and Desktop+ shows a capture window in the headset
+at the rate StarVizion draws it. A missed frame is visible to the pilot.
 
 - Never block the render thread: no file I/O, no network or IPC waits, no lock held by a thread that does any of
   those. Input polling, provider connections and file loading happen elsewhere and hand over results.
